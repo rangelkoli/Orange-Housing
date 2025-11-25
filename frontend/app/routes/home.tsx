@@ -42,65 +42,16 @@ export default function HomePage() {
   );
 }
 
-function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-stone-100">
-      <div className="container mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="bg-orange-500 p-1.5 rounded-lg text-white group-hover:bg-orange-600 transition-colors">
-            <Home size={20} fill="currentColor" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-stone-900">Syracuse Sanctuary</span>
-        </Link>
-
-        {/* Desktop Nav */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link to="#" className="text-sm font-medium text-stone-600 hover:text-orange-600 transition-colors">Rent</Link>
-          <Link to="#" className="text-sm font-medium text-stone-600 hover:text-orange-600 transition-colors">Buy</Link>
-          <Link to="#" className="text-sm font-medium text-stone-600 hover:text-orange-600 transition-colors">Landlords</Link>
-          <Link to="#" className="text-sm font-medium text-stone-600 hover:text-orange-600 transition-colors">Community</Link>
-        </div>
-
-        <div className="hidden md:flex items-center gap-4">
-          <Link to="#" className="text-sm font-medium text-stone-600 hover:text-orange-600 transition-colors">Login</Link>
-          <Link to="#" className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg shadow-orange-500/20">
-            List Your Space
-          </Link>
-        </div>
-
-        {/* Mobile Menu Button */}
-        <button className="md:hidden p-2 text-stone-600" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X /> : <Menu />}
-        </button>
-      </div>
-
-      {/* Mobile Nav */}
-      {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 w-full bg-white border-b border-stone-100 p-4 flex flex-col gap-4 shadow-xl">
-          <Link to="#" className="text-stone-600 font-medium p-2 hover:bg-stone-50 rounded-lg">Rent</Link>
-          <Link to="#" className="text-stone-600 font-medium p-2 hover:bg-stone-50 rounded-lg">Buy</Link>
-          <Link to="#" className="text-stone-600 font-medium p-2 hover:bg-stone-50 rounded-lg">Landlords</Link>
-          <Link to="#" className="text-stone-600 font-medium p-2 hover:bg-stone-50 rounded-lg">Community</Link>
-          <hr className="border-stone-100" />
-          <Link to="#" className="text-stone-600 font-medium p-2 hover:bg-stone-50 rounded-lg">Login</Link>
-          <Link to="#" className="bg-orange-500 text-white p-3 rounded-lg text-center font-semibold">List Your Space</Link>
-        </div>
-      )}
-    </nav>
-  );
-}
-
 function Hero() {
   return (
-    <div className="relative h-[600px] md:h-[700px] flex items-center justify-center overflow-hidden bg-background">
+    <div className="relative min-h-[500px] md:h-[700px] flex items-center justify-center overflow-hidden bg-background py-12 md:py-0">
       {/* Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
       <div className="relative z-10 container mx-auto px-4 max-w-5xl">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center  mb-8 tracking-tight text-primary">
-          Find Your Perfect Home, Apartment, or Room for Rent in Syracuse, NY
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-8 md:mb-0 tracking-tight text-primary leading-tight">
+          Find Your Perfect Home, Apartment, <br className="hidden md:block" />
+          or Room for Rent in Syracuse, NY
         </h1>
         <SearchWidget />
       </div>

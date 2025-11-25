@@ -7,7 +7,7 @@ export default [
     route("directory/complex", "routes/directory-complex.tsx"),
     route("directory/business", "routes/directory-business.tsx"),
     route("directory/landlords", "routes/directory-landlords.tsx"),
-    route("listings/:id", "routes/listing-details.tsx"),
+    route("listings/:id", "routes/listings.$id.tsx"),
     route("blog", "routes/blog.tsx"),
     route("about", "routes/about.tsx"),
     route("contact", "routes/contact.tsx"),

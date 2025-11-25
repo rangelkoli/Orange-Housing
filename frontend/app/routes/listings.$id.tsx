@@ -17,7 +17,12 @@ import {
   GraduationCap,
   Home,
   Info,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  X,
+  Flame,
+  Wind
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
@@ -52,12 +57,16 @@ export default function ListingDetailsPage() {
       { title: "Flexible Lease:", desc: "Options for study abroad or short-term needs." },
     ],
     amenities: [
-      { icon: Utensils, label: "Dishwasher", sub: "Yes" },
-      { icon: Waves, label: "Laundry", sub: "Free (In-Unit)" },
-      { icon: TreePine, label: "Porch", sub: "Yes" },
-      { icon: Car, label: "Parking", sub: "Off-street Available" },
-      { icon: Sofa, label: "Furnished", sub: "Partially" },
-      { icon: Home, label: "Building Type", sub: "Whole House" },
+      { id: 'type', icon: Home, label: "Building Type", sub: "Whole House", included: true },
+      { id: 'dishwasher', icon: Utensils, label: "Dishwasher", sub: "Yes", included: true },
+      { id: 'laundry', icon: Waves, label: "Laundry", sub: "Free (In-Unit)", included: true },
+      { id: 'porch', icon: TreePine, label: "Porch", sub: "Yes", included: true },
+      { id: 'parking', icon: Car, label: "Parking", sub: "Off-street Available", included: true },
+      { id: 'furnished', icon: Sofa, label: "Furnished", sub: "Partially", included: true },
+      { id: 'ac', icon: Wind, label: "Air Conditioning", sub: "None", included: false },
+      { id: 'fireplace', icon: Flame, label: "Fireplace", sub: "No", included: false },
+      { id: 'smoking', icon: Info, label: "Smoking", sub: "Contact for info", included: false },
+      { id: 'pets', icon: PawPrint, label: "Pets", sub: "No", included: false },
     ],
     agent: {
       name: "Dave Hornstein",
@@ -76,11 +85,16 @@ export default function ListingDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-stone-50 pb-20 pt-24">
+    <div className="min-h-screen bg-stone-50 pb-20 pt-24 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Breadcrumb / Back Link could go here */}
-        
+        {/* Breadcrumb / Back Link */}
+        <div className="flex items-center justify-between mb-8">
+          <Link to="/listings" className="text-stone-600 hover:text-stone-800 transition-colors">
+            <ArrowLeft className="inline-block mr-2 h-4 w-4" />
+            Back to Listings
+          </Link>
+        </div>
         {/* Image Gallery */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-2 rounded-2xl overflow-hidden h-[400px] md:h-[500px] mb-8 shadow-sm">
           <div className="md:col-span-2 h-full relative group">
@@ -122,24 +136,30 @@ export default function ListingDetailsPage() {
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col items-center justify-center text-center hover:border-orange-200 transition-colors">
-                <span className="block text-2xl md:text-3xl font-bold text-stone-900 mb-1">{listing.stats.beds}</span>
-                <span className="text-stone-500 font-medium text-sm uppercase tracking-wide">Bedrooms</span>
+            {/* Stats Row */}
+            <div className="flex items-center justify-between md:justify-center md:gap-16 py-8 border-y border-stone-200">
+              <div className="flex items-center gap-4 ">
+                <div className="p-2 bg-stone-100 rounded-full">
+                  <Sofa className="h-5 w-5 text-stone-600" />
+                </div>
+                <div>
+                  <span className="block text-2xl font-bold text-stone-900 leading-none">{listing.stats.beds}</span>
+                  <span className="text-stone-500 text-sm font-medium">Bedrooms</span>
+                </div>
               </div>
-              <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col items-center justify-center text-center hover:border-orange-200 transition-colors">
-                <span className="block text-2xl md:text-3xl font-bold text-stone-900 mb-1">{listing.stats.baths}</span>
-                <span className="text-stone-500 font-medium text-sm uppercase tracking-wide">Bathrooms</span>
-              </div>
-              <div className="bg-white p-5 rounded-xl border border-stone-200 shadow-sm flex flex-col items-center justify-center text-center hover:border-orange-200 transition-colors">
-                <Home className="h-8 w-8 text-stone-900 mb-1" />
-                <span className="text-stone-500 font-medium text-sm uppercase tracking-wide">{listing.stats.type}</span>
+              <div className="flex items-center gap-4">
+                <div className="p-2 bg-stone-100 rounded-full">
+                  <Waves className="h-5 w-5 text-stone-600" />
+                </div>
+                <div>
+                  <span className="block text-2xl font-bold text-stone-900 leading-none">{listing.stats.baths}</span>
+                  <span className="text-stone-500 text-sm font-medium">Bathrooms</span>
+                </div>
               </div>
             </div>
 
             {/* Description & Highlights */}
-            <section className="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm">
+            <section className="py-2">
               <h2 className="text-2xl font-bold text-stone-900 mb-4">About this Property</h2>
               <p className="text-stone-700 leading-relaxed mb-8 text-lg">
                 {listing.description}
@@ -160,25 +180,47 @@ export default function ListingDetailsPage() {
             </section>
 
             {/* Amenities & Features */}
-            <section>
+            <section className="py-8 border-t border-stone-200">
               <h2 className="text-2xl font-bold text-stone-900 mb-6">Features & Amenities</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {listing.amenities.map((amenity, idx) => (
-                  <div key={idx} className="p-4 rounded-xl border border-stone-200 bg-white flex items-center gap-3 hover:border-orange-200 transition-all">
-                    <div className="p-2 bg-orange-50 rounded-lg text-orange-600">
-                      <amenity.icon className="h-5 w-5" />
+              
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-y-8 gap-x-4">
+                {[
+                  { id: 'type', label: 'Building Type', icon: Home },
+                  { id: 'dishwasher', label: 'Dishwasher', icon: Utensils },
+                  { id: 'laundry', label: 'Laundry', icon: Waves },
+                  { id: 'porch', label: 'Porch', icon: TreePine },
+                  { id: 'parking', label: 'Parking', icon: Car },
+                  { id: 'furnished', label: 'Furnished', icon: Sofa },
+                  { id: 'ac', label: 'A/C', icon: Wind },
+                  { id: 'fireplace', label: 'Fireplace', icon: Flame },
+                  { id: 'pets', label: 'Pets', icon: PawPrint },
+                  { id: 'smoking', label: 'Smoking', icon: Info },
+                ].map((templateItem) => {
+                  const item = listing.amenities.find(a => a.id === templateItem.id);
+                  const isIncluded = item?.included || false;
+                  const value = item?.sub || "Not Specified";
+                  
+                  return (
+                    <div key={templateItem.id} className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <templateItem.icon className={`h-5 w-5 ${isIncluded ? 'text-green-600' : 'text-stone-300'}`} />
+                        <span className={`font-bold text-sm ${isIncluded ? 'text-green-700' : 'text-stone-400'}`}>
+                          {templateItem.label}
+                        </span>
+                      </div>
+                      <div className="pl-7">
+                        <span className={`text-sm ${isIncluded ? 'text-stone-900 font-medium' : 'text-stone-400'}`}>
+                          {value}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-stone-900 text-sm">{amenity.label}</p>
-                      <p className="text-xs text-stone-500">{amenity.sub}</p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </section>
 
             {/* Commute & Location */}
-            <section className="bg-white p-8 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+            <section className="py-8 border-t border-stone-200 space-y-6">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-2xl font-bold text-stone-900">Location & Commute</h2>
                 <span className="text-sm text-stone-500 bg-stone-100 px-3 py-1 rounded-full">{listing.location}</span>
@@ -232,7 +274,7 @@ export default function ListingDetailsPage() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Contact Card */}
-            <Card className="p-6 border-stone-200 shadow-md bg-white sticky top-24">
+            <Card className="p-6 border-stone-200 shadow-md bg-white">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-bold text-stone-900">Contact Lister</h3>
                 <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">Verified</span>
@@ -301,14 +343,7 @@ export default function ListingDetailsPage() {
               </div>
             </div>
 
-            {/* Alerts CTA */}
-            <div className="bg-stone-900 p-6 rounded-xl text-white shadow-lg">
-              <h3 className="font-bold text-lg mb-2">Don't miss out!</h3>
-              <p className="text-stone-300 text-sm mb-4">Get notified when similar properties become available.</p>
-              <Button variant="secondary" className="w-full font-semibold">
-                Set Apartment Alert
-              </Button>
-            </div>
+
 
           </div>
         </div>
