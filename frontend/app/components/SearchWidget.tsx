@@ -12,6 +12,7 @@ import {
   Armchair,
   Heart,
 } from "lucide-react";
+import { Calendar } from "./ui/calendar";
 
 const SearchWidget = () => {
   const [activeTab, setActiveTab] = useState("Rentals");
@@ -31,7 +32,6 @@ const SearchWidget = () => {
     year: number;
   }
 
-  const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<SelectedDate | null>(null);
 
   // Updated Tab Order and Labels
@@ -73,7 +73,6 @@ const SearchWidget = () => {
       furnished: "All",
     });
     setSelectedDate(null);
-    setShowCalendar(false);
   };
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -88,10 +87,15 @@ const SearchWidget = () => {
     (document.activeElement as HTMLElement)?.blur();
   };
 
-  const handleDateSelect = (day: number, month: number, year: number) => {
-    setSelectedDate({ day, month, year });
-    handleFilterChange("availableDate", `${month}/${day}/${year}`);
-    setShowCalendar(false);
+  const handleDateSelect = (date: Date | undefined) => {
+    if (!date) return;
+    setSelectedDate({
+      day: date.getDate(),
+      month: date.getMonth() + 1,
+      year: date.getFullYear(),
+    });
+    handleFilterChange("availableDate", date.toLocaleDateString());
+    (document.activeElement as HTMLElement)?.blur();
   };
 
   return (
@@ -231,7 +235,6 @@ const SearchWidget = () => {
               Available Date
             </label>
             <button
-              onClick={() => setShowCalendar(!showCalendar)}
               className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
             >
               <span className='truncate text-sm font-medium text-gray-900'>
@@ -242,22 +245,34 @@ const SearchWidget = () => {
                 className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0'>
+            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0 min-w-[300px]'>
               <button
                 onClick={() => {
                   handleOptionSelect("availableDate", "Available NOW");
-                  setShowCalendar(false);
                 }}
-                className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg'
+                className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer rounded-t-lg border-b border-gray-100'
               >
                 Available NOW
               </button>
-              <button
-                onClick={() => setShowCalendar(true)}
-                className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer last:rounded-b-lg'
-              >
-                Select Specific Date
-              </button>
+              <div className='p-3 flex justify-center z-20'>
+                <Calendar
+                  mode='single'
+                  captionLayout="dropdown"
+                  selected={
+                    selectedDate
+                      ? new Date(
+                          selectedDate.year,
+                          selectedDate.month - 1,
+                          selectedDate.day
+                        )
+                      : undefined
+                  }
+                  onSelect={handleDateSelect}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  fromYear={new Date().getFullYear()}
+                  toYear={new Date().getFullYear() + 5}
+                />
+              </div>
             </div>
           </div>
 

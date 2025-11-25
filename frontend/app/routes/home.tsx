@@ -44,7 +44,7 @@ export default function HomePage() {
 
 function Hero() {
   return (
-    <div className="relative min-h-[500px] md:h-[700px] flex items-center justify-center overflow-hidden bg-background py-12 md:py-0">
+    <div className="relative min-h-[500px] md:h-[700px] flex items-center justify-center bg-background py-12 md:py-0">
       {/* Grid Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
 
