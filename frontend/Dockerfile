@@ -10,7 +10,7 @@ RUN bun run build
 FROM oven/bun:1 AS prod-deps
 WORKDIR /app
 COPY package.json bun.lockb ./
-RUN bun install --frozen-lockfile --production
+RUN bun install --production
 
 # Stage 3: Run with Node
 FROM node:20-alpine AS runner
