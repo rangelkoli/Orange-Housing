@@ -10,7 +10,9 @@ import {
   Map,
   PawPrint,
   Armchair,
-  Heart
+  Heart,
+  Users,
+  Building
 } from 'lucide-react';
 
 const ListingFilter = () => {
@@ -18,10 +20,10 @@ const ListingFilter = () => {
 
   // Updated Tab Order and Labels
   const tabs = [
-    { id: 'Rentals', label: 'Rentals' },
-    { id: 'ShortTerm', label: 'Short Term' },
-    { id: 'Sublets', label: 'Sublets' },
-    { id: 'RoomForRent', label: 'Room For Rent' },
+    { id: 'Rentals', label: 'Rentals - 10 Plus Months' },
+    { id: 'ShortTerm', label: 'Short term - 9 months or less' },
+    { id: 'Sublets', label: 'Sublets - Take over tenants lease' },
+    { id: 'RoomForRent', label: 'Room for Rent - To share common areas' },
   ];
 
   // Updated Filter List with new options (Pets, Furnished) and specific order
@@ -32,6 +34,8 @@ const ListingFilter = () => {
     { label: 'Max Rent', icon: DollarSign, options: ['$1000', '$1500', '$2000', '$2500+'] },
     { label: 'Pets', icon: PawPrint, options: ['Dogs Allowed', 'Cats Allowed', 'No Pets'] },
     { label: 'Furnished', icon: Armchair, options: ['Furnished', 'Unfurnished', 'Partial'] },
+    { label: 'Perfect For', icon: Users, options: ['Students', 'Families', 'Professionals', 'Seniors'] },
+    { label: 'Building Type', icon: Building, options: ['Apartment', 'House', 'Studio', 'Condo', 'Townhouse'] },
   ];
 
   return (
@@ -88,8 +92,8 @@ const ListingFilter = () => {
           </div>
         </div>
 
-        {/* Drill Down Filters Row - Expanded to 6 columns for new items */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-6">
+        {/* Drill Down Filters Row - 4 columns (2 rows) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {filters.map((filter, index) => (
             <div key={index} className="relative group">
               <label className="block text-xs font-medium text-gray-500 mb-1.5 ml-1">{filter.label}</label>

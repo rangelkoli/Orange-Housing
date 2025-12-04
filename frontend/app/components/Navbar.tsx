@@ -90,11 +90,11 @@ export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
 // Default navigation links
 const defaultNavigationLinks: Navbar02NavItem[] = [
   {
-    label: "Rentals",
+    label: "Properties",
     submenu: true,
     items: [
-      { href: "/listings", label: "All Rentals" },
-      { href: "/listings", label: "Short Term Rentals" },
+      { href: "/listings", label: "All Properties" },
+      { href: "/listings", label: "Rentals" },
       { href: "/listings", label: "Sublets" },
       { href: "/listings", label: "Shared Spaces" },
     ],
@@ -112,16 +112,16 @@ const defaultNavigationLinks: Navbar02NavItem[] = [
     ],
   },
   {
+    label: "Team Syracuse ",
+    href: "/team-syracuse",
+  },
+  {
     label: "Buy",
     href: "/buy",
   },
   {
     label: "Sell",
     href: "/sell",
-  },
-  {
-    label: "Team Syracuse ",
-    href: "/team-syracuse",
   },
 ];
 
@@ -134,7 +134,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
       navigationLinks = defaultNavigationLinks,
       signInText = "",
       signInHref = "#",
-      ctaText = "Manage Your Listings",
+      ctaText = "Add/Manage Your Listings",
       ctaHref = "/",
       onSignInClick,
       onCtaClick,

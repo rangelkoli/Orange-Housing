@@ -11,6 +11,7 @@ export default function ListingsPage() {
   const listings: Listing[] = [
     {
       id: 1,
+      title: "Modern Family Home",
       price: "$2,200/mo",
       beds: 4,
       baths: 2,
@@ -25,6 +26,7 @@ export default function ListingsPage() {
     },
     {
       id: 2,
+      title: "Cozy Downtown Apartment",
       price: "$1,800/mo",
       beds: 2,
       baths: 2,
@@ -38,6 +40,7 @@ export default function ListingsPage() {
     },
     {
       id: 3,
+      title: "Student Studio Near Campus",
       price: "$950/mo",
       beds: 1,
       baths: 1,
@@ -51,6 +54,7 @@ export default function ListingsPage() {
     },
     {
       id: 4,
+      title: "Spacious 5-Bed House",
       price: "$3,100/mo",
       beds: 5,
       baths: 3,
@@ -64,6 +68,7 @@ export default function ListingsPage() {
     },
     {
       id: 5,
+      title: "Charming 2-Bed Flat",
       price: "$1,200/mo",
       beds: 2,
       baths: 1,
@@ -77,6 +82,7 @@ export default function ListingsPage() {
     },
     {
       id: 6,
+      title: "Affordable Shared Room",
       price: "$800/room",
       beds: 1,
       baths: 1,
@@ -144,7 +150,7 @@ export default function ListingsPage() {
             ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 max-w-3xl mx-auto'}
           `}>
             {listings.map((home) => (
-              <ListingCard key={home.id} home={home} />
+              <ListingCard key={home.id} home={home} layout={viewMode === 'list' ? 'list' : 'grid'} />
             ))}
           </div>
         )}

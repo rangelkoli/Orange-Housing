@@ -25,7 +25,7 @@ const SearchWidget = () => {
     pets: "All",
     furnished: "All",
   });
-  
+
   interface SelectedDate {
     day: number;
     month: number;
@@ -33,6 +33,28 @@ const SearchWidget = () => {
   }
 
   const [selectedDate, setSelectedDate] = useState<SelectedDate | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const filtersRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        filtersRef.current &&
+        !filtersRef.current.contains(event.target as Node)
+      ) {
+        setActiveDropdown(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const toggleDropdown = (name: string) => {
+    setActiveDropdown((prev) => (prev === name ? null : name));
+  };
 
   // Updated Tab Order and Labels
   const tabs = [
@@ -73,6 +95,7 @@ const SearchWidget = () => {
       furnished: "All",
     });
     setSelectedDate(null);
+    setActiveDropdown(null);
   };
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -84,7 +107,7 @@ const SearchWidget = () => {
 
   const handleOptionSelect = (filterName: string, value: string) => {
     handleFilterChange(filterName, value);
-    (document.activeElement as HTMLElement)?.blur();
+    setActiveDropdown(null);
   };
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -95,7 +118,7 @@ const SearchWidget = () => {
       year: date.getFullYear(),
     });
     handleFilterChange("availableDate", date.toLocaleDateString());
-    (document.activeElement as HTMLElement)?.blur();
+    setActiveDropdown(null);
   };
 
   return (
@@ -165,7 +188,7 @@ const SearchWidget = () => {
 
         {/* Header Text */}
         <div className='mb-6 text-center md:text-left'>
-          <h2 className='text-xl md:text-2xl font-bold text-gray-900 text-justify'>
+          <h2 className='text-xl md:text-2xl font-bold text-[#0D2D6C] text-justify'>
             Find Your Perfect <span className='text-orange-600'>Home</span>,{" "}
             <span className='text-orange-600'>Apartment</span>, or{" "}
             <span className='text-orange-600'>Room</span> for Rent in Syracuse,
@@ -174,67 +197,78 @@ const SearchWidget = () => {
         </div>
 
         {/* Drill Down Filters Row */}
-        <div className='grid grid-cols-12 gap-3 mb-6'>
+        <div className='grid grid-cols-12 gap-3 mb-6' ref={filtersRef}>
           {/* Location Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-3'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Location
             </label>
-            <button className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'>
+            <button
+              onClick={() => toggleDropdown("location")}
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+            >
               <span className='truncate text-sm font-medium text-gray-900'>
                 {filters.location}
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0'>
-              {filterOptions.location.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => handleOptionSelect("location", opt)}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            {activeDropdown === "location" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20'>
+                {filterOptions.location.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleOptionSelect("location", opt)}
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Building Type Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-3'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Building Type
             </label>
-            <button className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'>
+            <button
+              onClick={() => toggleDropdown("buildingType")}
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+            >
               <span className='truncate text-sm font-medium text-gray-900'>
                 {filters.buildingType}
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0'>
-              {filterOptions.buildingType.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => handleOptionSelect("buildingType", opt)}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            {activeDropdown === "buildingType" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20'>
+                {filterOptions.buildingType.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleOptionSelect("buildingType", opt)}
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Available Date Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-3'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Available Date
             </label>
             <button
+              onClick={() => toggleDropdown("availableDate")}
               className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
             >
               <span className='truncate text-sm font-medium text-gray-900'>
@@ -242,65 +276,74 @@ const SearchWidget = () => {
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0 min-w-[300px]'>
-              <button
-                onClick={() => {
-                  handleOptionSelect("availableDate", "Available NOW");
-                }}
-                className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer rounded-t-lg border-b border-gray-100'
-              >
-                Available NOW
-              </button>
-              <div className='p-3 flex justify-center z-20'>
-                <Calendar
-                  mode='single'
-                  captionLayout="dropdown"
-                  selected={
-                    selectedDate
-                      ? new Date(
-                          selectedDate.year,
-                          selectedDate.month - 1,
-                          selectedDate.day
-                        )
-                      : undefined
-                  }
-                  onSelect={handleDateSelect}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  fromYear={new Date().getFullYear()}
-                  toYear={new Date().getFullYear() + 5}
-                />
+            {activeDropdown === "availableDate" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 min-w-[300px]'>
+                <button
+                  onClick={() => {
+                    handleOptionSelect("availableDate", "Available NOW");
+                  }}
+                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer rounded-t-lg border-b border-gray-100'
+                >
+                  Available NOW
+                </button>
+                <div className='p-3 flex justify-center z-20'>
+                  <Calendar
+                    mode='single'
+                    captionLayout='dropdown'
+                    selected={
+                      selectedDate
+                        ? new Date(
+                            selectedDate.year,
+                            selectedDate.month - 1,
+                            selectedDate.day
+                          )
+                        : undefined
+                    }
+                    onSelect={handleDateSelect}
+                    disabled={(date) =>
+                      date < new Date(new Date().setHours(0, 0, 0, 0))
+                    }
+                    fromYear={new Date().getFullYear()}
+                    toYear={new Date().getFullYear() + 5}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Bedrooms Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-3'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Bedrooms
             </label>
-            <button className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'>
+            <button
+              onClick={() => toggleDropdown("bedrooms")}
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+            >
               <span className='truncate text-sm font-medium text-gray-900'>
                 {filters.bedrooms}
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0 max-h-48 overflow-y-auto'>
-              {filterOptions.bedrooms.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => handleOptionSelect("bedrooms", opt)}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            {activeDropdown === "bedrooms" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20 max-h-48 overflow-y-auto'>
+                {filterOptions.bedrooms.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleOptionSelect("bedrooms", opt)}
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Max Rent */}
@@ -323,57 +366,67 @@ const SearchWidget = () => {
           </div>
 
           {/* Pets Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-4'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-4'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Pets
             </label>
-            <button className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'>
+            <button
+              onClick={() => toggleDropdown("pets")}
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+            >
               <span className='truncate text-sm font-medium text-gray-900'>
                 {filters.pets}
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0'>
-              {filterOptions.pets.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => handleOptionSelect("pets", opt)}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            {activeDropdown === "pets" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20'>
+                {filterOptions.pets.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleOptionSelect("pets", opt)}
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Furnished Dropdown */}
-          <div className='relative group col-span-12 md:col-span-4 lg:col-span-4'>
+          <div className='relative col-span-12 md:col-span-4 lg:col-span-4'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
               Furnished
             </label>
-            <button className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'>
+            <button
+              onClick={() => toggleDropdown("furnished")}
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+            >
               <span className='truncate text-sm font-medium text-gray-900'>
                 {filters.furnished}
               </span>
               <ChevronDown
                 size={14}
-                className='text-gray-400 group-hover:text-gray-600 transition-colors shrink-0 ml-2'
+                className='text-gray-400 transition-colors shrink-0 ml-2'
               />
             </button>
-            <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-20 transform translate-y-1 group-focus-within:translate-y-0'>
-              {filterOptions.furnished.map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => handleOptionSelect("furnished", opt)}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                >
-                  {opt}
-                </button>
-              ))}
-            </div>
+            {activeDropdown === "furnished" && (
+              <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20'>
+                {filterOptions.furnished.map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleOptionSelect("furnished", opt)}
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
