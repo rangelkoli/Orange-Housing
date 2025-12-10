@@ -28,8 +28,11 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  // Hide public navbar on landlord dashboard pages
-  const isLandlordSection = location.pathname.startsWith('/landlord/dashboard') || location.pathname.startsWith('/landlord/create-listing');
+  // Hide public navbar on landlord dashboard and admin pages
+  const shouldHidePublicNav = 
+    location.pathname.startsWith('/landlord/dashboard') || 
+    location.pathname.startsWith('/landlord/create-listing') ||
+    location.pathname.startsWith('/admin');
 
   return (
     <html lang="en">
@@ -40,9 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="bg-background"  >
-        {!isLandlordSection && <Navbar />}
+        {!shouldHidePublicNav && <Navbar />}
         {children}
-        {!isLandlordSection && <Footer />}
+        {!shouldHidePublicNav && <Footer />}
         <ScrollRestoration />
         <Scripts />
       </body>

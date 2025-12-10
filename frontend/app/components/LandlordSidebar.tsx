@@ -7,9 +7,11 @@ import {
   FileText, 
   Settings, 
   LogOut,
-  Plus
+  Plus,
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 
 export function LandlordSidebar() {
   const location = useLocation();
@@ -67,6 +69,13 @@ export function LandlordSidebar() {
       <div className="mt-auto p-4 border-t border-stone-100">
         <nav className="space-y-1">
           <Link
+            to="/landlord/change-password"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors"
+          >
+            <Shield size={20} />
+            Change Password
+          </Link>
+          <Link
             to="#"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors"
           >
@@ -82,6 +91,7 @@ export function LandlordSidebar() {
           </Link>
         </nav>
       </div>
+
     </aside>
   );
 }

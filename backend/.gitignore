@@ -6,8 +6,7 @@ cloud-sql-proxy
 __pycache__
 db.sqlite3
 media
-
+venv
 # Backup files # 
 *.bak 
-data.sql
 structure.sql

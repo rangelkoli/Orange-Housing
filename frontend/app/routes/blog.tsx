@@ -62,7 +62,7 @@ export default function BlogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">
+    <div className="min-h-screen bg-stone-50 font-sans text-stone-900 flex flex-col">
       
       {/* Hero Section */}
       <div className="bg-stone-900 text-white py-20 relative overflow-hidden">

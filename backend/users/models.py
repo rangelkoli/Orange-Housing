@@ -24,6 +24,17 @@ class User(models.Model):
         default=BannedStatus.NOT_BANNED
     )
     
+    # Password type to track migration from MD5 to bcrypt
+    class PasswordType(models.TextChoices):
+        MD5 = 'md5', 'MD5 (Legacy)'
+        BCRYPT = 'bcrypt', 'Bcrypt'
+    
+    password_type = models.CharField(
+        max_length=10,
+        choices=PasswordType.choices,
+        default=PasswordType.BCRYPT  # New users get bcrypt
+    )
+    
     passwd_recovery_code = models.CharField(max_length=60, null=True, blank=True)
     passwd_recovery_date = models.DateTimeField(null=True, blank=True)
     first_name = models.CharField(max_length=255)
@@ -31,9 +42,10 @@ class User(models.Model):
     contact_number = models.CharField(max_length=255)
     last_ip = models.CharField(max_length=45, null=True, blank=True)
 
+
     class Meta:
         db_table = 'users'
-        managed = False  # Set to False if the table already exists and shouldn't be managed by Django migrations
+        managed = True
 
     def __str__(self):
         return self.user_email

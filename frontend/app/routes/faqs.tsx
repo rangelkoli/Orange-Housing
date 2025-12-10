@@ -5,7 +5,7 @@ import {
   AccordionTrigger,
 } from "../components/ui/accordion";
 import { Link } from "react-router";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 
 export const meta = () => {
   return [
@@ -46,14 +46,24 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50 font-sans text-stone-900 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 py-12">
+      <div className="container mx-auto px-4 max-w-6xl">
         
+
         <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium mb-4 transition-colors">
-            <ChevronLeft size={20} />
-            Back to Home
-          </Link>
+          <div className="flex items-center gap-4 mb-8">
+            <Link to="/" className="p-2 -ml-2 hover:bg-stone-200/50 rounded-full text-stone-600 transition-colors group" title="Back to Home">
+              <ArrowLeft className="h-5 w-5 group-hover:-translate-x-0.5 transition-transform" />
+            </Link>
+            
+            <div className="h-6 w-px bg-stone-300" />
+
+            <nav className="flex items-center text-sm text-stone-500">
+              <Link to="/" className="hover:text-stone-900 transition-colors">Home</Link>
+              <ChevronRight className="h-4 w-4 mx-2 text-stone-300" />
+              <span className="text-stone-900 font-medium">FAQ</span>
+            </nav>
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-4">Frequently Asked Questions</h1>
           <p className="text-xl text-stone-600">
             Everything you need to know about finding your home or listing your property in Syracuse.

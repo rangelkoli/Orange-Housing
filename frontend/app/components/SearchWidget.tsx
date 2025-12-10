@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
 import {
   Search,
   ChevronDown,
@@ -15,6 +16,7 @@ import {
 import { Calendar } from "./ui/calendar";
 
 const SearchWidget = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("Rentals");
   const [filters, setFilters] = useState({
     location: "All",
@@ -24,6 +26,7 @@ const SearchWidget = () => {
     maxRent: "",
     pets: "All",
     furnished: "All",
+    searchQuery: "",
   });
 
   interface SelectedDate {
@@ -93,9 +96,48 @@ const SearchWidget = () => {
       maxRent: "",
       pets: "All",
       furnished: "All",
+      searchQuery: "",
     });
     setSelectedDate(null);
     setActiveDropdown(null);
+  };
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    
+    // Add activeTab as type
+    if (activeTab !== "Rentals") {
+      params.set("type", activeTab);
+    }
+    
+    // Add filters to query params only if they're not default values
+    if (filters.location && filters.location !== "All") {
+      params.set("location", filters.location);
+    }
+    if (filters.buildingType && filters.buildingType !== "Building Type - All") {
+      params.set("buildingType", filters.buildingType);
+    }
+    if (filters.availableDate && filters.availableDate !== "Available NOW") {
+      params.set("availableDate", filters.availableDate);
+    }
+    if (filters.bedrooms && filters.bedrooms !== "All") {
+      params.set("bedrooms", filters.bedrooms);
+    }
+    if (filters.maxRent) {
+      params.set("maxRent", filters.maxRent);
+    }
+    if (filters.pets && filters.pets !== "All") {
+      params.set("pets", filters.pets);
+    }
+    if (filters.furnished && filters.furnished !== "All") {
+      params.set("furnished", filters.furnished);
+    }
+    if (filters.searchQuery) {
+      params.set("q", filters.searchQuery);
+    }
+    
+    const queryString = params.toString();
+    navigate(queryString ? `/listings?${queryString}` : "/listings");
   };
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -156,8 +198,8 @@ const SearchWidget = () => {
 
                   <span
                     className={`
-                    text-sm font-semibold transition-colors duration-200
-                    ${isActive ? "text-gray-900" : "text-gray-600 group-hover:text-gray-800"}
+                    text-base font-serif tracking-tight transition-colors duration-200
+                    ${isActive ? "text-gray-900 font-bold" : "text-gray-600 group-hover:text-gray-800"}
                   `}
                   >
                     {tab.label}
@@ -169,14 +211,14 @@ const SearchWidget = () => {
 
           {/* Right Side Buttons (Map View & Favorites) */}
           <div className='hidden sm:flex items-center gap-6'>
-            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group'>
+            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group font-mono'>
               <Map
                 size={18}
                 className='group-hover:scale-110 transition-transform'
               />
               <span>Map View</span>
             </button>
-            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group'>
+            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group font-mono'>
               <Heart
                 size={18}
                 className='group-hover:scale-110 transition-transform'
@@ -186,28 +228,18 @@ const SearchWidget = () => {
           </div>
         </div>
 
-        {/* Header Text */}
-        <div className='mb-6 text-center md:text-left'>
-          <h2 className='text-xl md:text-2xl font-bold text-[#0D2D6C] text-justify'>
-            Find Your Perfect <span className='text-orange-600'>Home</span>,{" "}
-            <span className='text-orange-600'>Apartment</span>, or{" "}
-            <span className='text-orange-600'>Room</span> for Rent in Syracuse,
-            NY
-          </h2>
-        </div>
-
         {/* Drill Down Filters Row */}
         <div className='grid grid-cols-12 gap-3 mb-6' ref={filtersRef}>
           {/* Location Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Location
             </label>
             <button
               onClick={() => toggleDropdown("location")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.location}
               </span>
               <ChevronDown
@@ -221,7 +253,7 @@ const SearchWidget = () => {
                   <button
                     key={opt}
                     onClick={() => handleOptionSelect("location", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
                   >
                     {opt}
                   </button>
@@ -232,14 +264,14 @@ const SearchWidget = () => {
 
           {/* Building Type Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Building Type
             </label>
             <button
               onClick={() => toggleDropdown("buildingType")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.buildingType}
               </span>
               <ChevronDown
@@ -253,7 +285,7 @@ const SearchWidget = () => {
                   <button
                     key={opt}
                     onClick={() => handleOptionSelect("buildingType", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
                   >
                     {opt}
                   </button>
@@ -264,14 +296,14 @@ const SearchWidget = () => {
 
           {/* Available Date Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Available Date
             </label>
             <button
               onClick={() => toggleDropdown("availableDate")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.availableDate}
               </span>
               <ChevronDown
@@ -285,7 +317,7 @@ const SearchWidget = () => {
                   onClick={() => {
                     handleOptionSelect("availableDate", "Available NOW");
                   }}
-                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer rounded-t-lg border-b border-gray-100'
+                  className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer rounded-t-lg border-b border-gray-100'
                 >
                   Available NOW
                 </button>
@@ -316,14 +348,14 @@ const SearchWidget = () => {
 
           {/* Bedrooms Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Bedrooms
             </label>
             <button
               onClick={() => toggleDropdown("bedrooms")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.bedrooms}
               </span>
               <ChevronDown
@@ -337,7 +369,7 @@ const SearchWidget = () => {
                   <button
                     key={opt}
                     onClick={() => handleOptionSelect("bedrooms", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
                   >
                     {opt}
                   </button>
@@ -348,33 +380,33 @@ const SearchWidget = () => {
 
           {/* Max Rent */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-4'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Max Rent
             </label>
             <div className='relative'>
               <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                <span className='text-gray-500 text-sm font-medium'>$</span>
+                <span className='text-gray-500 text-sm font-medium font-mono'>$</span>
               </div>
               <input
                 type='number'
                 placeholder='Max total rent'
                 value={filters.maxRent}
                 onChange={(e) => handleFilterChange("maxRent", e.target.value)}
-                className='w-full pl-6 pr-3 py-2.5 bg-white border border-gray-200 hover:border-gray-300 text-gray-900 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder-gray-400'
+                className='w-full pl-6 pr-3 py-2.5 bg-white border border-gray-200 hover:border-gray-300 text-gray-900 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 placeholder-gray-400 font-mono'
               />
             </div>
           </div>
 
           {/* Pets Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-4'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Pets
             </label>
             <button
               onClick={() => toggleDropdown("pets")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.pets}
               </span>
               <ChevronDown
@@ -388,7 +420,7 @@ const SearchWidget = () => {
                   <button
                     key={opt}
                     onClick={() => handleOptionSelect("pets", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
                   >
                     {opt}
                   </button>
@@ -399,14 +431,14 @@ const SearchWidget = () => {
 
           {/* Furnished Dropdown */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-4'>
-            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1'>
+            <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Furnished
             </label>
             <button
               onClick={() => toggleDropdown("furnished")}
-              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50'
+              className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
-              <span className='truncate text-sm font-medium text-gray-900'>
+              <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
                 {filters.furnished}
               </span>
               <ChevronDown
@@ -420,7 +452,7 @@ const SearchWidget = () => {
                   <button
                     key={opt}
                     onClick={() => handleOptionSelect("furnished", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 cursor-pointer first:rounded-t-lg last:rounded-b-lg'
+                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
                   >
                     {opt}
                   </button>
@@ -442,19 +474,25 @@ const SearchWidget = () => {
             <input
               type='text'
               placeholder='Enter City, Neighborhood, ZIP, or Listing ID...'
-              className='w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 hover:bg-white hover:border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200 text-base'
+              value={filters.searchQuery}
+              onChange={(e) => handleFilterChange("searchQuery", e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              className='w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 hover:bg-white hover:border-gray-300 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all duration-200 text-base font-mono'
             />
           </div>
 
           {/* Search and Reset Buttons */}
-          <button className='flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm'>
+          <button 
+            onClick={handleSearch}
+            className='flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm font-sans tracking-tight'
+          >
             <Search size={18} />
             Search
           </button>
 
           <button
             onClick={handleReset}
-            className='flex items-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm bg-white hover:bg-gray-50'
+            className='flex items-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm bg-white hover:bg-gray-50 font-sans tracking-tight'
           >
             <RefreshCw size={18} />
             Reset

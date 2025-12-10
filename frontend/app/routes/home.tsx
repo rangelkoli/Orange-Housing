@@ -24,11 +24,13 @@ import {
   Calendar,
   Square,
   Eye,
+  User,
+  Globe,
 } from "lucide-react";
 import SearchWidget from "../components/SearchWidget";
 import { useState } from "react";
 import { FaPhone } from "react-icons/fa";
-
+import { BackgroundGradientAnimation } from "components/ui/shadcn-io/background-gradient-animation";
 import { type MetaFunction } from "react-router";
 
 export const meta: MetaFunction = () => {
@@ -52,8 +54,8 @@ export default function HomePage() {
       <FeaturedHomes />
       <LocalAds />
       <Testimonials />
-      <FAQ />
       <Partners />
+      <FAQ />
       <Blog />
     </div>
   );
@@ -61,13 +63,40 @@ export default function HomePage() {
 
 function Hero() {
   return (
-    <div className='relative min-h-[500px] md:h-[700px] flex items-center justify-center bg-background py-12 md:py-0'>
-      {/* Grid Background */}
-      <div className='absolute inset-0 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]' />
-
-      <div className='relative z-10 container mx-auto px-4 max-w-5xl'>
-        <SearchWidget />
-      </div>
+    <div className='relative min-h-[500px] md:h-[700px] bg-[#eff0f3] flex items-center justify-center overflow-hidden py-12 md:py-0'>
+       <div
+    className="absolute inset-0 z-0"
+    style={{
+      backgroundImage: `
+        radial-gradient(circle at center, #FF5B04 0%, transparent 50%)
+      `,
+      opacity: 0.35,
+      mixBlendMode: "multiply",
+    }}
+  />
+        <div className='relative z-20 container mx-auto px-4 max-w-5xl pointer-events-none'>
+          <div className="pointer-events-auto">
+            <h1 className="text-balance text-center mb-8 tracking-tight font-serif text-[40px] leading-[1.2] text-[#292524] font-normal -tracking-[0.02em]">
+              Find Your Perfect
+              <span className="relative inline-block mx-2 text-[#FF5B04] italic cursor-pointer hover:text-orange-700
+                after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
+                after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
+                Home
+              </span>,
+              <span className="relative inline-block mx-2 text-[#FF5B04] italic cursor-pointer hover:text-orange-700
+                after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
+                after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
+                Apartment,
+              </span> or
+              <span className="relative inline-block mx-2 text-[#FF5B04] italic cursor-pointer hover:text-orange-700
+                after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
+                after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
+                Room
+              </span>for Rent in Syracuse, NY
+            </h1>
+            <SearchWidget />
+          </div>
+        </div>
     </div>
   );
 }
@@ -130,7 +159,10 @@ function FeaturedHomeCard({ home }: { home: any }) {
 
         <div className="absolute top-4 right-4 flex gap-2 z-20">
           <button 
-            onClick={(e) => { e.stopPropagation(); }}
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              navigate('/compare');
+            }}
             className='p-2 bg-white/90 backdrop-blur-sm rounded-full text-stone-400 hover:text-orange-500 transition-colors shadow-sm group/compare' 
             title="Compare"
           >
@@ -149,7 +181,7 @@ function FeaturedHomeCard({ home }: { home: any }) {
         <div className="absolute bottom-0 left-0">
           <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-tr-lg shadow-sm flex items-center gap-2 border border-stone-100">
             <Calendar size={14} className="text-orange-600" />
-            <span className="text-xs font-semibold text-stone-800 uppercase tracking-wide">
+            <span className="text-xs font-semibold text-stone-800 uppercase tracking-wide font-mono">
               Available {home.availableDate}
             </span>
           </div>
@@ -168,7 +200,7 @@ function FeaturedHomeCard({ home }: { home: any }) {
       <div className='p-6 flex flex-col gap-4'>
         <div>
           <div className="flex justify-between items-start mb-2">
-            <h3 className='text-xl font-bold text-stone-900 tracking-tight line-clamp-1'>
+            <h3 className='text-xl font-bold text-stone-900 tracking-tight line-clamp-1 font-serif'>
               {home.title}
             </h3>
           </div>
@@ -182,13 +214,13 @@ function FeaturedHomeCard({ home }: { home: any }) {
         </div>
 
         <div className='flex items-center py-4 border-t border-b border-stone-100'>
-          <div className="flex-1 flex items-center justify-center gap-2 text-stone-700">
+          <div className="flex-1 flex items-center justify-center gap-2 text-stone-700 font-mono">
             <Bed size={18} className="text-orange-500" />
             <span className="font-semibold">{home.beds}</span>
             <span className="text-stone-500 text-sm">Beds</span>
           </div>
           <div className="w-px h-4 bg-stone-200" />
-          <div className="flex-1 flex items-center justify-center gap-2 text-stone-700">
+          <div className="flex-1 flex items-center justify-center gap-2 text-stone-700 font-mono">
             <Bath size={18} className="text-orange-500" />
             <span className="font-semibold">{home.baths}</span>
             <span className="text-stone-500 text-sm">Baths</span>
@@ -198,16 +230,16 @@ function FeaturedHomeCard({ home }: { home: any }) {
         <div className='flex gap-3'>
           <button 
             onClick={(e) => { e.stopPropagation(); }}
-            className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn'
+            className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn font-mono uppercase text-xs'
           >
-            <FaPhone size={16} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
+            <FaPhone size={14} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
             Call
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); }}
-            className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2'
+            className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 font-mono uppercase text-xs'
           >
-            <Mail size={18} />
+            <Mail size={16} />
             Email
           </button>
         </div>
@@ -317,10 +349,10 @@ function FeaturedHomes() {
   ];
 
   return (
-    <section className='py-32 bg-[#F5F2EB]'>
+    <section className='py-32 bg-[#fffffe]'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4'>
+          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
             Featured Syracuse Apartments & Homes
           </h2>
           <p className='text-stone-600 max-w-2xl mx-auto'>
@@ -380,7 +412,7 @@ function LocalAds() {
     <section className='py-32 bg-white'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4'>
+          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
             Trusted Local Syracuse Businesses
           </h2>
           <p className='text-stone-600'>
@@ -401,13 +433,11 @@ function LocalAds() {
                   alt={biz.name}
                   className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
                 />
-                <button className='absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full text-stone-400 hover:text-red-500 transition-colors shadow-sm'>
-                  <Heart size={20} />
-                </button>
+
               </div>
-              <div className='p-8 gap-6 flex flex-col h-full'>
-                <div className='mb-4'>
-                  <h3 className='text-xl font-bold text-stone-900 mb-2'>
+              <div className='p-6 flex flex-col gap-4 h-full'>
+                <div>
+                  <h3 className='text-xl font-bold text-stone-900 mb-2 font-serif'>
                     {biz.name}
                   </h3>
                   <p className='text-stone-500 text-sm leading-relaxed'>
@@ -415,19 +445,19 @@ function LocalAds() {
                   </p>
                 </div>
 
-                <div className='mt-auto flex gap-3'>
+                <div className=' flex gap-3'>
                   <a 
                     href={`tel:${biz.phone}`}
-                    className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn'
+                    className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn font-mono uppercase text-xs'
                   >
-                    <FaPhone size={16} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
+                    <FaPhone size={14} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
                     Call
                   </a>
                   <a 
                     href={`mailto:${biz.email}`}
-                    className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2'
+                    className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 font-mono uppercase text-xs'
                   >
-                    <Mail size={18} />
+                    <Mail size={16} />
                     Email
                   </a>
                 </div>
@@ -483,7 +513,7 @@ function Testimonials() {
     <section className='py-32 bg-[#F5F2EB] overflow-hidden'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4'>
+          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
             Loved by the Syracuse Community
           </h2>
           <p className='text-stone-600 max-w-2xl mx-auto'>
@@ -509,7 +539,7 @@ function Testimonials() {
                 </p>
                 <div className='flex items-center justify-between mt-auto pt-6 border-t border-stone-100'>
                   <div>
-                    <h4 className='font-bold text-stone-900 text-sm'>
+                    <h4 className='font-bold text-stone-900 text-sm font-serif'>
                       {review.name}
                     </h4>
                     <p className='text-stone-500 text-xs'>{review.role}</p>
@@ -565,10 +595,10 @@ function FAQ() {
   const displayedFaqs = faqs.slice(0, 3);
 
   return (
-    <section className='py-32 bg-white'>
+    <section className='py-32 bg-[#F5F2EB]'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-12'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4'>
+          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
             Frequently Asked Questions about Renting in Syracuse
           </h2>
           <p className='text-stone-600'>
@@ -587,7 +617,7 @@ function FAQ() {
                 className='w-full p-5 flex items-center justify-between text-left'
                 onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
               >
-                <span className='font-medium text-stone-800'>{faq.q}</span>
+                <span className='font-medium text-stone-800 font-serif tracking-tight text-lg'>{faq.q}</span>
                 <ChevronRight
                   className={`text-stone-400 transition-transform duration-300 ${openIndex === idx ? "rotate-90" : ""}`}
                   size={20}
@@ -605,7 +635,7 @@ function FAQ() {
         <div className='text-center mt-10'>
           <Link
             to='/faqs'
-            className='px-6 py-2.5 bg-white border border-stone-200 rounded-full text-stone-600 font-medium hover:bg-stone-50 hover:text-orange-600 transition-all shadow-sm inline-block'
+            className='px-6 py-2.5 bg-white border border-stone-200 rounded-full text-stone-600 font-medium hover:bg-stone-50 hover:text-orange-600 transition-all shadow-sm inline-block font-mono uppercase text-xs'
           >
             More FAQs
           </Link>
@@ -616,39 +646,137 @@ function FAQ() {
 }
 
 function Partners() {
+  const partners = [
+    {
+      name: "Copper Beech",
+      contact: "Darya Rotblat",
+      phone: "(315) 565-7555",
+      email: "info@cbcsyracuse.com",
+      website: "https://cbcsyracuse.com/",
+    },
+    {
+      name: "Copper Beech",
+      contact: "Savonne",
+      phone: "(315) 565-7555",
+      email: "info@housingsyr.com",
+      website: "https://housingsyr.com",
+    },
+    {
+      name: "D.N. Drucker Ltd.",
+      contact: "Leasing Agent",
+      phone: "(315) 445-1229",
+      email: "info@dndruckerltd.com",
+      website: "https://dndruckerltd.com",
+    },
+    {
+      name: "Edward Glassberg",
+      contact: "Edward Glassberg",
+      phone: "(315) 427-6956",
+      email: "info@yourkeyrealtor.com",
+      website: "https://yourkeyrealtor.com",
+    },
+    {
+      name: "Skyler Commons",
+      contact: "Savonne",
+      phone: "(315) 565-7775",
+      email: "info@skylercommons.com",
+      website: "https://skylercommons.com",
+    },
+    {
+      name: "SU Rentals",
+      contact: "Brett",
+      phone: "(407) 312-5697",
+      email: "info@surentals.com",
+      website: "https://www.surentals.com",
+    },
+    {
+      name: "Syracuse Quality Living",
+      contact: "Property Manager",
+      phone: "(315) 820-0200",
+      email: "info@syracusequalityliving.com",
+      website: "https://syracusequalityliving.com",
+    },
+    {
+      name: "University Hill Realty",
+      contact: "Norm",
+      phone: "(315) 422-0709",
+      email: "info@universityhill.com",
+      website: "https://www.universityhill.com",
+    },
+    {
+      name: "Upstate Management",
+      contact: "Andy",
+      phone: "(315) 415-8613",
+      email: "info@upstatecos.com",
+      website: "https://www.upstatecos.com",
+    },
+  ];
+
   return (
     <section className='py-32 bg-white'>
-      <div className='container mx-auto px-4 text-center'>
-        <h2 className='text-2xl md:text-3xl font-bold text-stone-900 mb-4'>
-          Our Syracuse Community Partners
-        </h2>
-        <p className='text-stone-600 mb-12'>
-          We collaborate with local organizations to strengthen the Syracuse
-          housing community.
-        </p>
-
-        <div className='flex flex-wrap justify-center gap-12 md:gap-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500'>
-          {/* Placeholder logos using simple shapes/icons */}
-          <div className='w-16 h-16 bg-stone-200 rounded-lg flex items-center justify-center'>
-            <Building2 size={32} className='text-stone-500' />
-          </div>
-          <div className='w-16 h-16 bg-stone-200 rounded-lg flex items-center justify-center'>
-            <Home size={32} className='text-stone-500' />
-          </div>
-          <div className='w-16 h-16 bg-stone-200 rounded-lg flex items-center justify-center'>
-            <MapPin size={32} className='text-stone-500' />
-          </div>
-          <div className='w-16 h-16 bg-stone-200 rounded-lg flex items-center justify-center'>
-            <Heart size={32} className='text-stone-500' />
-          </div>
+      <div className='container mx-auto px-4'>
+        <div className='text-center mb-16'>
+          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
+            Our Syracuse Community Partners
+          </h2>
+          <p className='text-stone-600 max-w-2xl mx-auto'>
+            We collaborate with local organizations to strengthen the Syracuse
+            housing community.
+          </p>
         </div>
 
-        <p className='mt-12 text-stone-500 text-sm'>
-          Join us in making Syracuse an even better place to live.{" "}
-          <Link to='#' className='text-orange-500 hover:underline'>
-            Click here to see how to become a partner.
-          </Link>
-        </p>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto'>
+          {partners.map((partner, idx) => (
+            <div key={idx} className='bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col group'>
+              <div className='h-48 bg-stone-100 overflow-hidden relative border-b border-stone-100'>
+                 <img 
+                   src={`https://image.thum.io/get/width/600/crop/800/noanimate/${partner.website}`} 
+                   alt={`${partner.name} website`}
+                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                 />
+                 <div className="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors" />
+              </div>
+              
+              <div className="p-6 flex flex-col flex-grow items-center text-center">
+                <h3 className='text-xl font-bold text-stone-900 mb-1 font-serif'>
+                  {partner.name}
+                </h3>
+                <div className='flex items-center gap-2 text-stone-500 text-sm mb-6'>
+                  <User size={14} />
+                  <span>{partner.contact}</span>
+                </div>
+
+                <div className='w-full space-y-3 mt-auto'>
+                  <div className='flex gap-3'>
+                    <a 
+                      href={`tel:${partner.phone}`}
+                      className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 font-mono uppercase text-xs'
+                    >
+                      <FaPhone size={14} />
+                      Call
+                    </a>
+                    <a 
+                      href={`mailto:${partner.email}`}
+                      className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 font-mono uppercase text-xs'
+                    >
+                      <Mail size={16} />
+                      Email
+                    </a>
+                  </div>
+                  <a 
+                    href={partner.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className='w-full py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 font-mono uppercase text-xs'
+                  >
+                    <Globe size={16} />
+                    Visit Website
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -680,11 +808,11 @@ function Blog() {
   ];
 
   return (
-    <section className='py-32 bg-[#F5F2EB]'>
+    <section className='py-32 bg-white'>
       <div className='container mx-auto px-4'>
         <div className='flex flex-col md:flex-row justify-between items-end mb-12 gap-4'>
           <div>
-            <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4'>
+            <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
               Syracuse Housing & Lifestyle Blog
             </h2>
             <p className='text-stone-600'>

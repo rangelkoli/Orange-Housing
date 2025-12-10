@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 
 export function Footer() {
+  const currentYear = new Date().getFullYear();
+
   const handleSocialClick = (e: React.MouseEvent) => {
     e.preventDefault();
     alert("Coming Soon!");
@@ -27,7 +29,7 @@ export function Footer() {
           <div className='lg:col-span-4 space-y-10'>
             <div className="space-y-6">
               <Link to='/' className='inline-block'>
-                <span className='text-2xl font-bold tracking-tight text-stone-900'>
+                <span className='text-2xl font-bold tracking-tight text-stone-900 font-serif'>
                   OrangeHousing<span className='text-[#EB7B07]'>.com</span>
                 </span>
               </Link>
@@ -44,7 +46,7 @@ export function Footer() {
                   />
                 </div>
                 <div className='space-y-0.5'>
-                  <p className='text-[10px] font-bold text-[#EB7B07] uppercase tracking-wider'>
+                  <p className='text-[10px] font-bold text-[#EB7B07] uppercase tracking-wider font-mono'>
                     Certified Business
                   </p>
                   <p className='text-xs font-medium text-stone-600 leading-tight max-w-[180px]'>
@@ -55,7 +57,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h4 className='font-bold text-stone-900 text-sm uppercase tracking-wider mb-6'>
+              <h4 className='font-bold text-stone-900 text-sm mb-6 font-serif'>
                 Our Company
               </h4>
               <ul className='space-y-3 text-stone-600 text-sm'>
@@ -72,7 +74,7 @@ export function Footer() {
           {/* Column 2: Popular Searches & Locations (Span 5) */}
           <div className='lg:col-span-5 space-y-12'>
             <div>
-              <h4 className='font-bold text-stone-900 text-sm uppercase tracking-wider mb-6'>
+              <h4 className='font-bold text-stone-900 text-sm mb-6 font-serif'>
                 Popular Searches
               </h4>
               <ul className='grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 text-stone-600 text-sm'>
@@ -87,7 +89,7 @@ export function Footer() {
             </div>
             
             <div>
-              <h4 className='font-bold text-stone-900 text-sm uppercase tracking-wider mb-6'>
+              <h4 className='font-bold text-stone-900 text-sm mb-6 font-serif'>
                 Locations We Serve
               </h4>
               <div className='grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-2 text-xs text-stone-500'>
@@ -133,14 +135,14 @@ export function Footer() {
           {/* Column 3: Let Us Help (Span 3) */}
           <div className='lg:col-span-3 space-y-10'>
             <div>
-              <h4 className='font-bold text-stone-900 text-sm uppercase tracking-wider mb-6'>
+              <h4 className='font-bold text-stone-900 text-sm mb-6 font-serif'>
                 Let Us Help
               </h4>
               <ul className='space-y-4 text-stone-600 text-sm'>
                 <li className="flex flex-col gap-1">
                   <span className="font-semibold text-stone-900">Contact Us</span>
-                  <a href="mailto:support@orangehousing.com" className='hover:text-[#EB7B07] transition-colors'>Email Us</a>
-                  <a href="tel:3152634621" className='hover:text-[#EB7B07] transition-colors'>(315) 263-4621</a>
+                  <a href="mailto:support@orangehousing.com" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>Email Us</a>
+                  <a href="tel:3152634621" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>(315) 263-4621</a>
                 </li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Avoid Scams</Link></li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>List a Property</Link></li>
@@ -150,7 +152,7 @@ export function Footer() {
             </div>
 
             <div>
-              <h5 className="font-bold text-stone-900 text-sm uppercase tracking-wider mb-4">Follow Us</h5>
+              <h5 className="font-bold text-stone-900 text-sm mb-4 font-serif">Follow Us</h5>
               <div className='flex flex-wrap gap-2'>
                 <button onClick={handleSocialClick} className='p-2 rounded-lg text-stone-500 hover:bg-[#EB7B07] hover:text-white transition-all duration-300'>
                   <Facebook size={20} />
@@ -182,15 +184,15 @@ export function Footer() {
         <div className='border-t border-stone-200 pt-8 flex flex-col items-center text-center gap-6'>
           <div className="flex items-center justify-center gap-2">
             <Home className="h-5 w-5 text-[#EB7B07]" />
-            <span className="font-bold text-stone-900 text-lg">OrangeHousing.com</span>
+            <span className="font-bold text-stone-900 text-lg font-serif">OrangeHousing.com</span>
           </div>
           <p className='text-stone-500 text-sm max-w-3xl leading-relaxed'>
             OrangeHousing.com is committed to and abides by the Fair Housing Act and Equal Opportunity Act. 
             <Link to="#" className="text-[#EB7B07] hover:underline ml-1 font-medium">Fair Housing Policy</Link> and 
             <Link to="#" className="text-[#EB7B07] hover:underline ml-1 font-medium">The New York State Fair Housing Notice</Link>.
           </p>
-          <p className='text-stone-400 text-xs'>
-            © {new Date().getFullYear()} OrangeHousing.com. All rights reserved.
+          <p className='text-stone-400 text-xs font-mono'>
+            © {currentYear} OrangeHousing.com. All rights reserved.
           </p>
         </div>
       </div>

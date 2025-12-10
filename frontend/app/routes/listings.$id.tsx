@@ -3,7 +3,6 @@ import {
   Heart, 
   Mail, 
   Phone, 
-  MessageSquare, 
   Utensils, 
   Waves, 
   Car, 
@@ -11,23 +10,22 @@ import {
   Calendar,
   PawPrint,
   Clock,
-  Tag,
   MapPin,
   Sofa,
-  GraduationCap,
   Home,
   Info,
-  ArrowRight,
   ArrowLeft,
-  Check,
   X,
   Flame,
   Wind,
   ChevronRight,
   Flag,
-  ChevronLeft
+  ChevronLeft,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router";
 import {
   Dialog,
   DialogContent,
@@ -42,13 +40,87 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
-import { Link } from "react-router";
+
+// Types for the listing data from backend
+interface ListingData {
+  id: number;
+  title: string;
+  price: string;
+  rent: number | null;
+  beds: number;
+  baths: string;
+  address: string;
+  city: string;
+  zip: number | null;
+  images: string[];
+  availableDate: string;
+  details: string | null;
+  pets: string | null;
+  utilities: string | null;
+  furnished: string | null;
+  laundry: string | null;
+  parking: string | null;
+  building_type: string | null;
+  contact_name: string;
+  contact_email: string | null;
+  contact_number: string | null;
+  featured: number;
+  latLng: string | null;
+  physicalAddress: string | null;
+  lease_length: string | null;
+  fireplace: string | null;
+  dishwasher: string | null;
+  porch: string | null;
+  smoking: string | null;
+  perfect_for: string | null;
+  location: string | null;
+  date_created: string;
+  date_expires: string;
+}
 
 export default function ListingDetailsPage() {
+  const { id } = useParams();
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [listing, setListing] = useState<ListingData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch listing data from backend
+  useEffect(() => {
+    const fetchListing = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
+        const response = await fetch(`${backendUrl}/listings/${id}/`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error('Listing not found');
+          }
+          throw new Error('Failed to fetch listing');
+        }
+        
+        const data = await response.json();
+        setListing(data.listing);
+      } catch (err: any) {
+        console.error('Error fetching listing:', err);
+        setError(err.message || 'Failed to load listing');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchListing();
+    }
+  }, [id]);
 
   // Handle keyboard navigation for the gallery
   useEffect(() => {
+    if (!listing) return;
+    
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedImageIndex === null) return;
       
@@ -67,70 +139,132 @@ export default function ListingDetailsPage() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedImageIndex]);
+  }, [selectedImageIndex, listing]);
 
-  // Data from OrangeHousing.com listing 9178
-  const listing = {
-    title: "Spacious 3-Bedroom Home Near University",
-    price: "$2,025/mo",
-    pricePerBed: "$675/bedroom",
-    address: "811 Ackerman Ave",
-    location: "University Area (Corner of Euclid and Ackerman)",
-    cityStateZip: "Syracuse, NY 13210",
-    stats: {
-      beds: 3,
-      baths: 1,
-      type: "Whole House"
+  // Loading State
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-orange-600 mx-auto mb-4" />
+          <p className="text-stone-600 font-medium">Loading listing details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error State
+  if (error || !listing) {
+    return (
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-red-600" />
+          </div>
+          <h1 className="text-2xl font-bold text-stone-900 mb-2">
+            {error === 'Listing not found' ? 'Listing Not Found' : 'Error Loading Listing'}
+          </h1>
+          <p className="text-stone-600 mb-6">
+            {error === 'Listing not found' 
+              ? 'The listing you are looking for does not exist or has been removed.'
+              : 'There was an error loading this listing. Please try again later.'
+            }
+          </p>
+          <Link 
+            to="/listings"
+            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-xl transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Listings
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper to format price per bed
+  const pricePerBed = listing.rent && listing.beds > 0 
+    ? `$${Math.round(listing.rent / listing.beds)}/bedroom` 
+    : null;
+
+  // Build amenities list from listing data
+  const amenities = [
+    { 
+      id: 'type', 
+      icon: Home, 
+      label: "Building Type", 
+      sub: listing.building_type || "Not specified", 
+      included: !!listing.building_type 
     },
-    images: [
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=2000&auto=format&fit=crop", // Placeholder for house
-      "https://images.unsplash.com/photo-1556912173-3db9963f6fdb?q=80&w=1000&auto=format&fit=crop", // Porch/Exterior
-      "https://images.unsplash.com/photo-1598228723793-52759bba239c?q=80&w=1000&auto=format&fit=crop", // Kitchen
-      "https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?q=80&w=1000&auto=format&fit=crop", // Living Room
-      "https://images.unsplash.com/photo-1584622050111-993a426fbf0a?q=80&w=1000&auto=format&fit=crop", // Bedroom
-    ],
-    description: "Easy walk to campus, off-street parking, great front porch, free laundry. Lease term flexible for tenants going abroad or seeking short-term housing.",
-    highlights: [
-      { title: "Great Location:", desc: "Corner of Euclid and Ackerman, easy walk to campus." },
-      { title: "Student Friendly:", desc: "Perfect for students seeking a whole house." },
-      { title: "Outdoor Space:", desc: "Enjoy the great front porch." },
-      { title: "Convenience:", desc: "Off-street parking and free laundry included." },
-      { title: "Flexible Lease:", desc: "Options for study abroad or short-term needs." },
-    ],
-    amenities: [
-      { id: 'type', icon: Home, label: "Building Type", sub: "Whole House", included: true },
-      { id: 'dishwasher', icon: Utensils, label: "Dishwasher", sub: "Yes", included: true },
-      { id: 'laundry', icon: Waves, label: "Laundry", sub: "Free (In-Unit)", included: true },
-      { id: 'porch', icon: TreePine, label: "Porch", sub: "Yes", included: true },
-      { id: 'parking', icon: Car, label: "Parking", sub: "Off-street Available", included: true },
-      { id: 'furnished', icon: Sofa, label: "Furnished", sub: "Partially", included: true },
-      { id: 'ac', icon: Wind, label: "Air Conditioning", sub: "None", included: false },
-      { id: 'fireplace', icon: Flame, label: "Fireplace", sub: "No", included: false },
-      { id: 'smoking', icon: Info, label: "Smoking", sub: "Contact for info", included: false },
-      { id: 'pets', icon: PawPrint, label: "Pets", sub: "No", included: false },
-    ],
-    agent: {
-      name: "Dave Hornstein",
-      role: "Property Manager",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
-      phone: "(315) 436-4733",
-      email: "dave@orangehousing.com",
-      texting: true
+    { 
+      id: 'dishwasher', 
+      icon: Utensils, 
+      label: "Dishwasher", 
+      sub: listing.dishwasher || "Not specified", 
+      included: listing.dishwasher?.toLowerCase() === 'yes' 
     },
-    details: {
-      availableDate: "06-01-2026",
-      leaseLength: "12 months",
-      pets: "No",
-      perfectFor: "Students",
-      smoking: "Contact for info"
-    }
-  };
+    { 
+      id: 'laundry', 
+      icon: Waves, 
+      label: "Laundry", 
+      sub: listing.laundry || "Not specified", 
+      included: !!listing.laundry && listing.laundry.toLowerCase() !== 'no' && listing.laundry.toLowerCase() !== 'none'
+    },
+    { 
+      id: 'porch', 
+      icon: TreePine, 
+      label: "Porch", 
+      sub: listing.porch || "Not specified", 
+      included: listing.porch?.toLowerCase() === 'yes' 
+    },
+    { 
+      id: 'parking', 
+      icon: Car, 
+      label: "Parking", 
+      sub: listing.parking || "Not specified", 
+      included: !!listing.parking && listing.parking.toLowerCase() !== 'no' && listing.parking.toLowerCase() !== 'none'
+    },
+    { 
+      id: 'furnished', 
+      icon: Sofa, 
+      label: "Furnished", 
+      sub: listing.furnished || "Not specified", 
+      included: listing.furnished?.toLowerCase() === 'yes' || listing.furnished?.toLowerCase() === 'partially'
+    },
+    { 
+      id: 'ac', 
+      icon: Wind, 
+      label: "Air Conditioning", 
+      sub: "Contact for info", 
+      included: false 
+    },
+    { 
+      id: 'fireplace', 
+      icon: Flame, 
+      label: "Fireplace", 
+      sub: listing.fireplace || "Not specified", 
+      included: listing.fireplace?.toLowerCase() === 'yes' 
+    },
+    { 
+      id: 'pets', 
+      icon: PawPrint, 
+      label: "Pets", 
+      sub: listing.pets === '1' ? 'Yes' : listing.pets === '0' ? 'No' : listing.pets || "Not specified", 
+      included: listing.pets === '1' || listing.pets?.toLowerCase() === 'yes'
+    },
+    { 
+      id: 'smoking', 
+      icon: Info, 
+      label: "Smoking", 
+      sub: listing.smoking || "Contact for info", 
+      included: listing.smoking?.toLowerCase() === 'yes' 
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20 pt-24 ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Breadcrumb / Back Link */}
         {/* Navigation Bar */}
         <div className="flex items-center gap-4 mb-6">
           <Link to="/listings" className="p-2 -ml-2 hover:bg-stone-100 rounded-full text-stone-600 transition-colors group" title="Back to Listings">
@@ -151,16 +285,21 @@ export default function ListingDetailsPage() {
         {/* Title Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">{listing.title}</h1>
-          <div className="flex items-center gap-2 text-stone-600">
+          <div className="flex flex-wrap items-center gap-2 text-stone-600">
             <MapPin className="h-4 w-4 text-orange-500" />
-            <span className="font-medium">{listing.address}, {listing.cityStateZip}</span>
-            <span className="text-stone-300 mx-2">•</span>
-            <span className="text-stone-500">{listing.location}</span>
-            <div className="mt-1">
-              <p className="text-sm font-medium text-stone-400">ID: #9178</p>
+            <span className="font-medium">{listing.address}, {listing.city}</span>
+            {listing.location && (
+              <>
+                <span className="text-stone-300 mx-2">•</span>
+                <span className="text-stone-500">{listing.location}</span>
+              </>
+            )}
+            <div className="w-full sm:w-auto mt-1 sm:mt-0">
+              <p className="text-sm font-medium text-stone-400">ID: #{listing.id}</p>
             </div>
           </div>
         </div>
+
         {/* Image Gallery */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 rounded-3xl overflow-hidden h-[400px] md:h-[500px] mb-12 shadow-sm border border-stone-100">
           <div 
@@ -173,7 +312,7 @@ export default function ListingDetailsPage() {
             </div>
           </div>
           <div className="hidden md:grid grid-cols-2 col-span-2 gap-3 h-full">
-            {listing.images.slice(1).map((img, idx) => (
+            {listing.images.slice(1, 5).map((img, idx) => (
               <div 
                 key={idx} 
                 className="overflow-hidden h-full relative cursor-pointer"
@@ -194,7 +333,9 @@ export default function ListingDetailsPage() {
               <div>
                 <div className="flex items-baseline gap-3 mb-3">
                   <h1 className="text-4xl font-bold text-stone-900 tracking-tight">{listing.price}</h1>
-                  <span className="text-lg text-stone-500 font-medium">{listing.pricePerBed}</span>
+                  {pricePerBed && (
+                    <span className="text-lg text-stone-500 font-medium">{pricePerBed}</span>
+                  )}
                 </div>
               </div>
               <div className="flex gap-3">
@@ -214,7 +355,7 @@ export default function ListingDetailsPage() {
                   <Sofa className="h-6 w-6 text-stone-700" />
                 </div>
                 <div>
-                  <span className="block text-2xl font-bold text-stone-900 leading-none mb-1">{listing.stats.beds}</span>
+                  <span className="block text-2xl font-bold text-stone-900 leading-none mb-1">{listing.beds}</span>
                   <span className="text-stone-500 text-sm font-medium">Bedrooms</span>
                 </div>
               </div>
@@ -223,7 +364,7 @@ export default function ListingDetailsPage() {
                   <Waves className="h-6 w-6 text-stone-700" />
                 </div>
                 <div>
-                  <span className="block text-2xl font-bold text-stone-900 leading-none mb-1">{listing.stats.baths}</span>
+                  <span className="block text-2xl font-bold text-stone-900 leading-none mb-1">{listing.baths}</span>
                   <span className="text-stone-500 text-sm font-medium">Bathrooms</span>
                 </div>
               </div>
@@ -232,33 +373,34 @@ export default function ListingDetailsPage() {
                   <Clock className="h-6 w-6 text-stone-700" />
                 </div>
                 <div>
-                  <span className="block text-xl font-bold text-stone-900 leading-none mb-1">{listing.details.leaseLength}</span>
+                  <span className="block text-xl font-bold text-stone-900 leading-none mb-1">
+                    {listing.lease_length ? `${listing.lease_length} months` : 'Flexible'}
+                  </span>
                   <span className="text-stone-500 text-sm font-medium">Lease</span>
                 </div>
               </div>
             </div>
 
-            {/* Description & Highlights */}
+            {/* Available Date */}
+            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-2xl">
+              <Calendar className="h-5 w-5 text-green-600" />
+              <span className="font-medium text-green-800">
+                Available: {listing.availableDate}
+              </span>
+              {listing.perfect_for && (
+                <>
+                  <span className="text-green-300 mx-2">•</span>
+                  <span className="text-green-700">Perfect for {listing.perfect_for}</span>
+                </>
+              )}
+            </div>
+
+            {/* Description */}
             <section className="space-y-6">
               <h2 className="text-2xl font-bold text-stone-900">About this Property</h2>
               <p className="text-stone-600 leading-relaxed text-lg">
-                {listing.description}
+                {listing.details || 'No description provided for this listing.'}
               </p>
-              
-              <div className="bg-stone-50 rounded-2xl p-8 border border-stone-100">
-                <h3 className="text-lg font-bold text-stone-900 mb-6">Highlights</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
-                  {listing.highlights.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-4">
-                      <div className="mt-2 w-1.5 h-1.5 rounded-full bg-orange-500 flex-shrink-0" />
-                      <div>
-                        <span className="font-bold text-stone-900 block mb-1">{item.title}</span>
-                        <span className="text-stone-600 text-sm leading-relaxed">{item.desc}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </section>
 
             {/* Amenities & Features */}
@@ -266,46 +408,46 @@ export default function ListingDetailsPage() {
               <h2 className="text-2xl font-bold text-stone-900 mb-8">Features & Amenities</h2>
               
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                {[
-                  { id: 'type', label: 'Building Type', icon: Home },
-                  { id: 'dishwasher', label: 'Dishwasher', icon: Utensils },
-                  { id: 'laundry', label: 'Laundry', icon: Waves },
-                  { id: 'porch', label: 'Porch', icon: TreePine },
-                  { id: 'parking', label: 'Parking', icon: Car },
-                  { id: 'furnished', label: 'Furnished', icon: Sofa },
-                  { id: 'ac', label: 'A/C', icon: Wind },
-                  { id: 'fireplace', label: 'Fireplace', icon: Flame },
-                  { id: 'pets', label: 'Pets', icon: PawPrint },
-                  { id: 'smoking', label: 'Smoking', icon: Info },
-                ].map((templateItem) => {
-                  const item = listing.amenities.find(a => a.id === templateItem.id);
-                  const isIncluded = item?.included || false;
-                  const value = item?.sub || "Not Specified";
-                  
-                  return (
-                    <div key={templateItem.id} className={`flex items-start gap-4 p-4 rounded-xl border transition-colors ${isIncluded ? 'bg-white border-stone-200' : 'bg-stone-50 border-transparent opacity-60'}`}>
-                      <div className={`p-2 rounded-lg ${isIncluded ? 'bg-green-50 text-green-700' : 'bg-stone-200 text-stone-400'}`}>
-                        <templateItem.icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <span className={`block font-bold text-sm mb-0.5 ${isIncluded ? 'text-stone-900' : 'text-stone-500'}`}>
-                          {templateItem.label}
-                        </span>
-                        <span className="text-xs text-stone-500 font-medium">
-                          {value}
-                        </span>
-                      </div>
+                {amenities.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className={`flex items-start gap-4 p-4 rounded-xl border transition-colors ${
+                      item.included 
+                        ? 'bg-white border-stone-200' 
+                        : 'bg-stone-50 border-transparent opacity-60'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${
+                      item.included 
+                        ? 'bg-green-50 text-green-700' 
+                        : 'bg-stone-200 text-stone-400'
+                    }`}>
+                      <item.icon className="h-5 w-5" />
                     </div>
-                  );
-                })}
+                    <div>
+                      <span className={`block font-bold text-sm mb-0.5 ${
+                        item.included ? 'text-stone-900' : 'text-stone-500'
+                      }`}>
+                        {item.label}
+                      </span>
+                      <span className="text-xs text-stone-500 font-medium">
+                        {item.sub}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
 
-            {/* Commute & Location */}
+            {/* Location */}
             <section className="pt-8 border-t border-stone-200 space-y-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-stone-900">Location & Commute</h2>
-                <span className="text-sm font-medium text-stone-500 bg-stone-100 px-4 py-2 rounded-full border border-stone-200">{listing.location}</span>
+                {listing.location && (
+                  <span className="text-sm font-medium text-stone-500 bg-stone-100 px-4 py-2 rounded-full border border-stone-200">
+                    {listing.location}
+                  </span>
+                )}
               </div>
               
               {/* Map Placeholder */}
@@ -359,41 +501,49 @@ export default function ListingDetailsPage() {
             <div className="sticky top-24 space-y-6">
               {/* Contact Card */}
               <Card className="p-6 border-stone-200 shadow-xl shadow-stone-200/50 bg-white rounded-3xl overflow-hidden">
-                <div className="flex items-center justify-between mb-8 pb-6 border-b border-stone-100">
+                <div className="mb-6 pb-6 border-b border-stone-100">
                   <h3 className="text-xl font-bold text-stone-900">Contact Lister</h3>
-                  <span className="bg-green-100 text-green-700 text-[10px] uppercase tracking-wider font-bold px-3 py-1.5 rounded-full">Verified</span>
                 </div>
                 
-                <div className="flex items-center gap-5 mb-8">
-                  <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-white shadow-md ring-2 ring-stone-100">
-                     <img src={listing.agent.image} alt={listing.agent.name} className="w-full h-full object-cover" />
+                <div className="flex items-center gap-5 mb-6">
+                  <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-white shadow-md ring-2 ring-stone-100 bg-stone-200 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-stone-500">
+                      {listing.contact_name ? listing.contact_name.charAt(0).toUpperCase() : '?'}
+                    </span>
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg text-stone-900 leading-tight">{listing.agent.name}</h4>
-                    <p className="text-sm text-stone-500 font-medium mb-1">{listing.agent.role}</p>
-                    <Link to="#" className="text-xs text-orange-600 font-bold hover:underline">
-                      View All Listings by {listing.agent.name}
-                    </Link>
+                    <h4 className="font-bold text-lg text-stone-900 leading-tight">
+                      {listing.contact_name || 'Contact Person'}
+                    </h4>
+                    <p className="text-sm text-stone-500 font-medium mb-1">Property Manager</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                  <Button asChild variant="outline" className="w-full border-stone-200 hover:bg-stone-50 hover:text-orange-600 h-12 rounded-xl font-semibold">
-                    <a href={`tel:${listing.agent.phone}`}>
-                      <Phone className="mr-2 h-4 w-4" />
-                      Call
-                    </a>
-                  </Button>
-                  <Button asChild variant="outline" className="w-full border-stone-200 hover:bg-stone-50 hover:text-orange-600 h-12 rounded-xl font-semibold">
-                    <a href={`mailto:${listing.agent.email}`}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Email
-                    </a>
-                  </Button>
+                  {listing.contact_number && (
+                    <Button asChild variant="outline" className="w-full border-stone-200 hover:bg-stone-50 hover:text-orange-600 h-12 rounded-xl font-semibold">
+                      <a href={`tel:${listing.contact_number}`}>
+                        <Phone className="mr-2 h-4 w-4" />
+                        Call
+                      </a>
+                    </Button>
+                  )}
+                  {listing.contact_email && (
+                    <Button asChild variant="outline" className="w-full border-stone-200 hover:bg-stone-50 hover:text-orange-600 h-12 rounded-xl font-semibold">
+                      <a href={`mailto:${listing.contact_email}`}>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Email
+                      </a>
+                    </Button>
+                  )}
                 </div>
 
                 <form className="space-y-4">
-                  <Textarea placeholder="I am interested in this property..." className="resize-none bg-stone-50 border-stone-200 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl p-4" rows={4} />
+                  <Textarea 
+                    placeholder="I am interested in this property..." 
+                    className="resize-none bg-stone-50 border-stone-200 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl p-4" 
+                    rows={4} 
+                  />
                   <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 text-lg shadow-lg shadow-orange-200 rounded-xl transition-all hover:scale-[1.02]">
                     Send Message
                   </Button>
@@ -451,6 +601,7 @@ export default function ListingDetailsPage() {
           </div>
         </div>
       </div>
+
       {/* Full Screen Image Gallery Overlay */}
       {selectedImageIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-lg">
@@ -489,7 +640,7 @@ export default function ListingDetailsPage() {
               src={listing.images[selectedImageIndex]} 
               alt={`View ${selectedImageIndex + 1}`} 
               className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking the image itself
+              onClick={(e) => e.stopPropagation()}
             />
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md">
               {selectedImageIndex + 1} / {listing.images.length}

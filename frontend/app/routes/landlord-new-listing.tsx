@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { ChevronLeft, Upload, Calendar, MapPin, Check } from "lucide-react";
+import { ChevronLeft, Upload, Calendar, MapPin, Check, PawPrint, Sofa, WashingMachine, Car, Flame, Droplets, Wifi, Zap, Snowflake, Trash2, Tv, Wind } from "lucide-react";
 
 export default function CreateListingPage() {
   const [step, setStep] = useState(1);
@@ -63,9 +63,15 @@ export default function CreateListingPage() {
                   <span className="text-xs text-stone-400">0 / 1000 characters</span>
                 </div>
                 <textarea 
+                  name="details"
                   className="w-full p-4 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all min-h-[120px]"
                   placeholder="Describe the property, its features, and the neighborhood..."
                 ></textarea>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700">Perfect For</label>
+                <input type="text" name="perfect_for" placeholder="e.g., Students, Families, Young Professionals" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
               </div>
 
               <div className="space-y-2">
@@ -76,6 +82,7 @@ export default function CreateListingPage() {
                   </div>
                   <p className="text-stone-600 font-medium mb-1">Drag & drop photos here or <span className="text-orange-600">browse</span></p>
                   <p className="text-xs text-stone-400">Max 10 photos. First photo must be the exterior.</p>
+                  <input type="hidden" name="cover_photo_id" />
                 </div>
               </div>
             </div>
@@ -88,19 +95,19 @@ export default function CreateListingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">Contact Name</label>
-                <input type="text" placeholder="e.g., Jane Doe" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                <input type="text" name="contact_name" placeholder="e.g., Jane Doe" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" required />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">Contact Email</label>
-                <input type="email" placeholder="e.g., jane.doe@email.com" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                <input type="email" name="contact_email" placeholder="e.g., jane.doe@email.com" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">10-Digit Contact Number</label>
-                <input type="tel" placeholder="e.g., 3151234567" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                <input type="tel" name="contact_number" placeholder="e.g., 3151234567" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
               </div>
               <div className="flex items-center h-full pt-8">
                 <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" className="w-5 h-5 rounded border-stone-300 text-orange-600 focus:ring-orange-500" />
+                  <input type="checkbox" name="textOk" value="1" className="w-5 h-5 rounded border-stone-300 text-orange-600 focus:ring-orange-500" />
                   <span className="text-sm font-medium text-stone-700">Okay to text?</span>
                 </label>
               </div>
@@ -114,26 +121,31 @@ export default function CreateListingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-stone-700">Street Number</label>
-                  <input type="text" placeholder="e.g., 123" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                  <label className="text-sm font-medium text-stone-700">Full Physical Address</label>
+                  <input type="text" name="address" placeholder="123 Main Street" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-stone-700">Street Name</label>
-                  <input type="text" placeholder="e.g., Main Street" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-stone-700">Full Physical Address (for map)</label>
-                  <input type="text" placeholder="123 Main Street, Syracuse, NY 13210" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Unit / Apt #</label>
+                    <input type="text" name="unit" placeholder="e.g., 4B" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                    </div>
+                    <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Zip Code</label>
+                    <input type="text" name="zip" placeholder="e.g., 13210" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                    </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-stone-700">Location / Neighborhood</label>
-                  <select className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
-                    <option>University Area</option>
-                    <option>Westcott</option>
-                    <option>Downtown</option>
-                    <option>Tipperary Hill</option>
+                  <select name="location" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
+                    <option value="University Area">University Area</option>
+                    <option value="Westcott">Westcott</option>
+                    <option value="Downtown">Downtown</option>
+                    <option value="Tipperary Hill">Tipperary Hill</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
+                <input type="hidden" name="physicalAddress" />
+                <input type="hidden" name="latLng" />
               </div>
               
               <div className="space-y-2">
@@ -158,11 +170,11 @@ export default function CreateListingPage() {
                 <label className="text-sm font-medium text-stone-700">Price Type</label>
                 <div className="grid grid-cols-2 gap-4">
                   <label className="flex items-center gap-3 p-4 border-2 border-orange-200 bg-orange-50 rounded-xl cursor-pointer transition-all">
-                    <input type="radio" name="priceType" className="w-5 h-5 text-orange-600 focus:ring-orange-500" defaultChecked />
+                    <input type="radio" name="rent_type" value="perBed" className="w-5 h-5 text-orange-600 focus:ring-orange-500" defaultChecked />
                     <span className="font-medium text-stone-900">Per Bedroom / Month</span>
                   </label>
                   <label className="flex items-center gap-3 p-4 border border-stone-200 rounded-xl cursor-pointer hover:bg-stone-50 transition-all">
-                    <input type="radio" name="priceType" className="w-5 h-5 text-orange-600 focus:ring-orange-500" />
+                    <input type="radio" name="rent_type" value="total" className="w-5 h-5 text-orange-600 focus:ring-orange-500" />
                     <span className="font-medium text-stone-900">Total Price / Month</span>
                   </label>
                 </div>
@@ -171,29 +183,22 @@ export default function CreateListingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-stone-700">Rent ($)</label>
-                  <input type="text" placeholder="$ e.g., 750" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+                  <input type="number" name="rent" placeholder="$ e.g., 750" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-stone-700">Lease Length (months)</label>
-                  <select className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
-                    <option>12 Months</option>
-                    <option>10 Months</option>
-                    <option>6 Months</option>
-                    <option>Month-to-Month</option>
-                  </select>
+                  <input type="number" name="lease_length" placeholder="e.g. 12" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-stone-700">Lease Starts</label>
                   <div className="relative">
-                    <input type="text" placeholder="mm/dd/yyyy" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
+                    <input type="date" name="date_avail" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-stone-700">Lease Ends</label>
                   <div className="relative">
-                    <input type="text" placeholder="mm/dd/yyyy" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
-                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
+                    <input type="date" name="tenant_lease_end" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
                   </div>
                 </div>
               </div>
@@ -207,33 +212,24 @@ export default function CreateListingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">Building Type</label>
-                <select className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
-                  <option>Multi-Family Home</option>
-                  <option>Apartment Complex</option>
-                  <option>Single Family Home</option>
-                  <option>Townhouse</option>
+                <select name="building_type" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
+                  <option value="Multi-Family Home">Multi-Family Home</option>
+                  <option value="Apartment Complex">Apartment Complex</option>
+                  <option value="Single Family Home">Single Family Home</option>
+                  <option value="Townhouse">Townhouse</option>
                 </select>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">Beds</label>
-                <select className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
-                  <option>Studio</option>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5+</option>
-                </select>
+                <input type="number" name="beds" placeholder="e.g. 3" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-stone-700">Baths</label>
-                <select className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500">
-                  <option>1</option>
-                  <option>1.5</option>
-                  <option>2</option>
-                  <option>2.5</option>
-                  <option>3+</option>
-                </select>
+                <input type="text" name="baths" placeholder="e.g. 1.5" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700">Total Beds in Unit</label>
+                <input type="number" name="total_beds" placeholder="e.g. 4" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-orange-500" />
               </div>
             </div>
           </section>
@@ -242,51 +238,202 @@ export default function CreateListingPage() {
           <section className="bg-white p-8 rounded-xl border border-stone-200 shadow-sm">
             <h2 className="text-xl font-bold text-stone-900 mb-6">Amenities & Features</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">Pets</label>
-                <div className="flex bg-stone-100 rounded-lg p-1">
-                  <button type="button" className="flex-1 py-1.5 bg-white shadow-sm rounded-md text-sm font-medium text-stone-900">Yes</button>
-                  <button type="button" className="flex-1 py-1.5 text-sm font-medium text-stone-500 hover:text-stone-900">No</button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">Furnished</label>
-                <div className="flex bg-stone-100 rounded-lg p-1">
-                  <button type="button" className="flex-1 py-1.5 text-sm font-medium text-stone-500 hover:text-stone-900">Yes</button>
-                  <button type="button" className="flex-1 py-1.5 bg-white shadow-sm rounded-md text-sm font-medium text-stone-900">No</button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">Laundry</label>
-                <select className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500">
-                  <option>In-unit</option>
-                  <option>On-site</option>
-                  <option>None</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700">Parking</label>
-                <select className="w-full p-2 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500">
-                  <option>Off-street</option>
-                  <option>Garage</option>
-                  <option>Street</option>
-                </select>
-              </div>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              {/* Core Features */}
+              <div className="space-y-6">
+                <h3 className="text-sm font-semibold text-stone-900 uppercase tracking-wider">Property Features</h3>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700 flex items-center gap-2">
+                      <PawPrint size={16} className="text-stone-400" />
+                      Pets Allowed
+                    </label>
+                    <select name="pets" className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 transition-colors">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                        <option value="Cats">Cats Only</option>
+                        <option value="Dogs">Dogs Only</option>
+                    </select>
+                  </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700">Includes</label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['Heat', 'Water', 'Wi-Fi', 'Electricity', 'Snow Removal', 'Trash', 'Cable', 'Gas'].map((item) => (
-                  <label key={item} className="flex items-center gap-3 cursor-pointer">
-                    <input type="checkbox" className="w-5 h-5 rounded border-stone-300 text-orange-600 focus:ring-orange-500" />
-                    <span className="text-sm text-stone-600">{item}</span>
-                  </label>
-                ))}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700 flex items-center gap-2">
+                      <Sofa size={16} className="text-stone-400" />
+                      Furnished
+                    </label>
+                    <select name="furnished" className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 transition-colors">
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                        <option value="Part">Partially</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700 flex items-center gap-2">
+                      <WashingMachine size={16} className="text-stone-400" />
+                      Laundry
+                    </label>
+                    <select name="laundry" className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 transition-colors">
+                      <option value="None">None</option>
+                      <option value="In-unit">In-unit</option>
+                      <option value="On-site">On-site</option>
+                      <option value="Hookups">Hookups Only</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700 flex items-center gap-2">
+                      <Car size={16} className="text-stone-400" />
+                      Parking
+                    </label>
+                    <select name="parking" className="w-full p-2.5 bg-stone-50 border border-stone-200 rounded-lg text-sm focus:outline-none focus:border-orange-500 transition-colors">
+                      <option value="Street">Street</option>
+                      <option value="Off-street">Off-street</option>
+                      <option value="Garage">Garage</option>
+                      <option value="Covered">Covered</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Utilities & Extras */}
+              <div className="space-y-6">
+                <h3 className="text-sm font-semibold text-stone-900 uppercase tracking-wider">Utilities & Extras</h3>
+                <div className="grid grid-cols-2 gap-3">
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="utilities" value="Heat" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Heat Included</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="utilities" value="Water" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Water Included</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="utilities" value="Electric" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Electric Included</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="utilities" value="Wifi" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Wifi Included</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="fireplace" value="Yes" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Fireplace</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="dishwasher" value="Yes" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Dishwasher</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="porch" value="Yes" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Porch/Deck</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="smoking" value="Yes" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Smoking Allowed</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                        <input type="checkbox" name="is_season" value="Yes" className="w-4 h-4 text-orange-600" />
+                        <span className="text-sm">Seasonal Rental</span>
+                    </label>
+                </div>
               </div>
             </div>
           </section>
+
+          {/* Housemate Preferences (For Shared Living) */}
+          <section className="bg-white p-8 rounded-xl border border-stone-200 shadow-sm">
+            <h2 className="text-xl font-bold text-stone-900 mb-6">Housemate Preferences (Optional)</h2>
+            <p className="text-sm text-stone-500 mb-6">Fill this out if you are looking for housemates or listing a room in a shared house.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Kitchen Cleanliness</label>
+                    <select name="house_kitchen" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                        <option value="">Select...</option>
+                        <option value="Clean as you go">Clean as you go</option>
+                        <option value="Clean daily">Clean daily</option>
+                        <option value="Clean weekly">Clean weekly</option>
+                        <option value="Messy is okay">Messy is okay</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Chores</label>
+                    <select name="house_chores" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                        <option value="">Select...</option>
+                        <option value="Split evenly">Split evenly</option>
+                        <option value="Rotate">Rotate</option>
+                        <option value="Hire cleaner">Hire cleaner</option>
+                        <option value="Do your own">Do your own</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Sleep Schedule</label>
+                    <select name="house_sleep" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                        <option value="">Select...</option>
+                        <option value="Early bird">Early bird</option>
+                        <option value="Night owl">Night owl</option>
+                        <option value="Flexible">Flexible</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">General Cleanliness</label>
+                    <select name="house_clean" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                        <option value="">Select...</option>
+                        <option value="Neat freak">Neat freak</option>
+                        <option value="Average">Average</option>
+                        <option value="Relaxed">Relaxed</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Drinking/Partying</label>
+                    <select name="house_drink" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                        <option value="">Select...</option>
+                        <option value="Non-drinker">Non-drinker</option>
+                        <option value="Socially">Socially</option>
+                        <option value="Frequently">Frequently</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">We Are (Current Household)</label>
+                    <input type="text" name="we_are" placeholder="e.g. 2 male students" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">We Prefer (Housemate)</label>
+                    <input type="text" name="we_prefer" placeholder="e.g. Quiet student" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Beds Needed</label>
+                    <input type="number" name="beds_needed" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">I Am (Applicant)</label>
+                    <input type="text" name="i_am" placeholder="e.g. Grad student" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Max Rent</label>
+                    <input type="number" name="max_rent" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">My Gender</label>
+                    <input type="text" name="my_gender" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-stone-700">Prefer Gender</label>
+                    <input type="text" name="prefer_gender" className="w-full p-3 bg-stone-50 border border-stone-200 rounded-lg" />
+                </div>
+            </div>
+          </section>
+
+          {/* Hidden Fields for Database Defaults/Required */}
+          <input type="hidden" name="user_id" value="1" /> {/* TODO: Get from auth */}
+          <input type="hidden" name="date_created" value={new Date().toISOString().split('T')[0]} />
+          <input type="hidden" name="date_expires" value={new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0]} />
+          <input type="hidden" name="visible" value="1" />
+          <input type="hidden" name="featured" value="0" />
+          <input type="hidden" name="typeCode" value="1" />
+          <input type="hidden" name="spotlightListing" value="2010-01-01" />
 
           {/* Footer Actions */}
           <div className="flex items-center justify-end gap-4 pt-4 pb-20">

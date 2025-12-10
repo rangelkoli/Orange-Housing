@@ -1,0 +1,120 @@
+# =============================================================================
+# Google Cloud Build Configuration - GitHub Triggered CI/CD
+# =============================================================================
+# This file automates build and deployment when changes are pushed to GitHub.
+#
+# AUTOMATIC TRIGGER SETUP:
+#   This build is triggered automatically when you push to GitHub.
+#   See README or setup instructions below for connecting GitHub to Cloud Build.
+#
+# MANUAL USAGE (if needed):
+#   gcloud builds submit --config cloudbuild.yaml
+#
+# PREREQUISITES:
+#   1. Enable Cloud Build API: gcloud services enable cloudbuild.googleapis.com
+#   2. Enable Cloud Run API: gcloud services enable run.googleapis.com
+#   3. Connect GitHub repo to Cloud Build (see setup instructions below)
+#   4. Grant Cloud Run Admin role to Cloud Build service account
+# =============================================================================
+
+steps:
+  # Step 1: Pull the previous image for Docker layer caching (speeds up builds)
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        docker pull gcr.io/$PROJECT_ID/orange-housing-backend:latest || exit 0
+    id: 'pull-cache'
+
+  # Step 2: Build the Docker image with cache
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--cache-from'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:$COMMIT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:$SHORT_SHA'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:latest'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:$BRANCH_NAME'
+      - '.'
+    id: 'build'
+    waitFor: ['pull-cache']
+
+  # Step 3: Push all image tags to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '--all-tags', 'gcr.io/$PROJECT_ID/orange-housing-backend']
+    id: 'push'
+    waitFor: ['build']
+
+  # Step 4: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'orange-housing-backend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/orange-housing-backend:$COMMIT_SHA'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '${_MEMORY}'
+      - '--cpu'
+      - '${_CPU}'
+      - '--min-instances'
+      - '${_MIN_INSTANCES}'
+      - '--max-instances'
+      - '${_MAX_INSTANCES}'
+      - '--set-env-vars'
+      - 'DJANGO_SETTINGS_MODULE=backend.settings_production,DEBUG=False,ALLOWED_HOSTS=.run.app'
+    id: 'deploy'
+    waitFor: ['push']
+
+  # Step 5: Output the deployed URL
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "=============================================="
+        echo "🚀 Deployment Complete!"
+        echo "=============================================="
+        gcloud run services describe orange-housing-backend \
+          --region=${_REGION} \
+          --format='value(status.url)'
+        echo "=============================================="
+        echo "Commit: $COMMIT_SHA"
+        echo "Branch: $BRANCH_NAME"
+        echo "=============================================="
+    id: 'output-url'
+    waitFor: ['deploy']
+
+# Images to push to Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/orange-housing-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/orange-housing-backend:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/orange-housing-backend:latest'
+
+# Substitution variables (can be overridden in trigger settings)
+substitutions:
+  _REGION: 'us-central1'
+  _MEMORY: '512Mi'
+  _CPU: '1'
+  _MIN_INSTANCES: '0'
+  _MAX_INSTANCES: '10'
+
+# Build timeout (20 minutes)
+timeout: '1200s'
+
+# Build options
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'  # Faster builds

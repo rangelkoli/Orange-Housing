@@ -18,6 +18,19 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import {
+  Building2,
+  Home,
+  ArrowRightLeft,
+  Users,
+  Building,
+  Store,
+  Contact,
+  ShoppingCart,
+  DollarSign,
+  Medal,
+  type LucideIcon,
+} from "lucide-react";
 
 // Simple logo component for the navbar
 const Logo = (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
@@ -68,10 +81,12 @@ const HamburgerIcon = ({
 export interface Navbar02NavItem {
   href?: string;
   label: string;
+  icon?: LucideIcon;
   submenu?: boolean;
   items?: Array<{
     href: string;
     label: string;
+    icon?: LucideIcon;
   }>;
 }
 
@@ -90,38 +105,44 @@ export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
 // Default navigation links
 const defaultNavigationLinks: Navbar02NavItem[] = [
   {
-    label: "Properties",
+    label: "PROPERTIES",
+    icon: Building2,
     submenu: true,
     items: [
-      { href: "/listings", label: "All Properties" },
-      { href: "/listings", label: "Rentals" },
-      { href: "/listings", label: "Sublets" },
-      { href: "/listings", label: "Shared Spaces" },
+      { href: "/listings", label: "All Properties", icon: Building2 },
+      { href: "/rentals", label: "Rentals", icon: Home },
+      { href: "/sublets", label: "Sublets", icon: ArrowRightLeft },
+      { href: "/rooms", label: "Rooms for Rent", icon: Users },
     ],
   },
   {
-    label: "Directory",
+    label: "DIRECTORY",
+    icon: Building,
     submenu: true,
     items: [
-      { href: "/directory/complex", label: "Apartment Complex" },
-      { href: "/directory/business", label: "Business Directory" },
+      { href: "/directory/complex", label: "Apartment Complex", icon: Building },
+      { href: "/directory/business", label: "Business Directory", icon: Store },
       {
         href: "/directory/landlords",
         label: "Landlords and Property Managers",
+        icon: Contact,
       },
     ],
   },
   {
-    label: "Team Syracuse ",
+    label: "TEAM SYRACUSE",
     href: "/team-syracuse",
+    icon: Medal,
   },
   {
-    label: "Buy",
+    label: "BUY",
     href: "/buy",
+    icon: ShoppingCart,
   },
   {
-    label: "Sell",
+    label: "SELL",
     href: "/sell",
+    icon: DollarSign,
   },
 ];
 
@@ -135,7 +156,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
       signInText = "",
       signInHref = "#",
       ctaText = "Add/Manage Your Listings",
-      ctaHref = "/",
+      ctaHref = "/landlord/login",
       onSignInClick,
       onCtaClick,
       ...props
@@ -179,53 +200,56 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
       <header
         ref={combinedRef}
         className={cn(
-          "sticky top-0 z-50 w-full border-b border-border/40 bg-[#F5F2EB]",
+          "sticky top-0 z-50 w-full border-b border-stone-200 bg-white/80 backdrop-blur-md font-mono uppercase supports-[backdrop-filter]:bg-white/60",
           className
         )}
         {...props}
       >
-        <div className='w-full px-6 flex h-16 items-center justify-between'>
-          {/* Left side */}
+        <div className='w-full px-6 flex h-16 items-center justify-between '>
+          {/* Left side: Logo & Mobile Menu */}
           <div className='flex items-center gap-2'>
             {/* Mobile menu trigger */}
             {isMobile && (
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    className='group h-9 w-9 hover:bg-accent hover:text-accent-foreground'
+                    className='group h-9 w-9 hover:bg-orange-50 hover:text-orange-600'
                     variant='ghost'
                     size='icon'
                   >
-                    <HamburgerIcon />
+                    <HamburgerIcon className="text-stone-600" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align='start' className='w-64 p-1'>
                   <NavigationMenu className='max-w-none'>
                     <NavigationMenuList className='flex-col items-start gap-0'>
                       {navigationLinks.map((link, index) => (
-                        <NavigationMenuItem key={index} className='w-full'>
+                        <NavigationMenuItem key={index} className='w-full '>
                           {link.submenu ? (
                             <>
-                              <div className='text-muted-foreground px-2 py-1.5 text-xs font-medium'>
+                              <div className='text-stone-500 px-2 py-1.5 text-xs font-medium uppercase tracking-wider'>
                                 {link.label}
                               </div>
                               <ul>
-                                {link.items?.map((item, itemIndex) => (
-                                  <li key={itemIndex}>
-                                    <Link
-                                      to={item.href || "#"}
-                                      className='flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline'
-                                    >
-                                      {item.label}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
+                                    {link.items?.map((item, itemIndex) => {
+                                      const ItemIcon = item.icon;
+                                      return (
+                                      <li key={itemIndex}>
+                                        <Link
+                                          to={item.href || "#"}
+                                          className='flex flex-row w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 cursor-pointer no-underline'
+                                        >
+                                          {ItemIcon && <ItemIcon className="h-4 w-4 flex-shrink-0" />}
+                                          {item.label}
+                                        </Link>
+                                      </li>
+                                    )})}
+                                  </ul>
                             </>
                           ) : (
                             <Link
                               to={link.href || "#"}
-                              className='flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer no-underline'
+                              className='flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 cursor-pointer no-underline'
                             >
                               {link.label}
                             </Link>
@@ -236,12 +260,12 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                               navigationLinks[index + 1].submenu) ||
                               (link.submenu &&
                                 !navigationLinks[index + 1].submenu)) && (
-                              <div
-                                role='separator'
-                                aria-orientation='horizontal'
-                                className='bg-border -mx-1 my-1 h-px w-full'
-                              />
-                            )}
+                                <div
+                                  role='separator'
+                                  aria-orientation='horizontal'
+                                  className='bg-stone-200 -mx-1 my-1 h-px w-full'
+                                />
+                              )}
                         </NavigationMenuItem>
                       ))}
                     </NavigationMenuList>
@@ -252,22 +276,22 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
             {/* Logo */}
             <Link
               to={logoHref}
-              className='flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer'
+              className='flex items-center space-x-2 transition-opacity hover:opacity-80 cursor-pointer'
             >
-              <div className='text-2xl'>{logo}</div>
+              <div className='flex items-center'>{logo}</div>
             </Link>
           </div>
 
           {/* Center: Desktop Nav */}
           {!isMobile && (
-            <div className='flex-1 flex justify-center'>
-              <NavigationMenu className='flex'>
+            <div className='flex-1 flex justify-center uppercase'>
+              <NavigationMenu className='hidden md:flex'>
                 <NavigationMenuList className='gap-1'>
                   {navigationLinks.map((link, index) => (
                     <NavigationMenuItem key={index}>
                       {link.submenu ? (
                         <>
-                          <NavigationMenuTrigger className='bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary font-medium text-base hover:text-primary/80'>
+                          <NavigationMenuTrigger className='h-9 bg-transparent px-4 py-2 text-sm font-medium text-stone-600 hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 data-[active]:bg-orange-50 data-[state=open]:bg-orange-50 data-[active]:text-orange-600 data-[state=open]:text-orange-600'>
                             {link.label}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent>
@@ -277,6 +301,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                                   key={itemIndex}
                                   title={item.label}
                                   href={item.href}
+                                  icon={item.icon}
                                 />
                               ))}
                             </div>
@@ -288,7 +313,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                             to={link.href || "#"}
                             className={cn(
                               navigationMenuTriggerStyle(),
-                              "cursor-pointer bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary font-medium text-base hover:text-primary/80"
+                              "h-9 cursor-pointer bg-transparent px-4 py-2 text-sm font-medium text-stone-600 hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 data-[active]:bg-orange-50 data-[state=open]:bg-orange-50 data-[active]:text-orange-600 data-[state=open]:text-orange-600"
                             )}
                           >
                             {link.label}
@@ -299,17 +324,27 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                   ))}
                 </NavigationMenuList>
                 <div className='absolute top-full left-0 flex w-full justify-center'>
-                  <NavigationMenuViewport className='origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]' />
+                    <NavigationMenuViewport className='origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-stone-200 bg-white text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]' />
                 </div>
               </NavigationMenu>
             </div>
           )}
 
-          {/* Right side */}
-          <div className='flex justify-end items-center gap-4'>
+          {/* Right side: Auth & CTA */}
+          <div className='flex items-center gap-3'>
+            {signInText && (
+               <Button 
+                variant="ghost" 
+                asChild
+                className="hidden sm:inline-flex text-stone-600 hover:text-orange-600 hover:bg-orange-50 font-medium"
+               >
+                 <Link to={signInHref}>{signInText}</Link>
+               </Button>
+            )}
+            
             <Button
               asChild
-              className='bg-[#118B50] hover:bg-[#118B50]/90 text-primary-foreground font-semibold shadow-sm transition-all hover:shadow-md px-6'
+              className='bg-[#118B50] hover:bg-[#118B50]/90 text-white font-medium shadow-none hover:shadow-sm px-5 h-9 rounded-md transition-all'
             >
               <Link to={ctaHref}>{ctaText}</Link>
             </Button>
@@ -327,17 +362,23 @@ const ListItem = React.forwardRef<
   React.ComponentPropsWithoutRef<"a"> & {
     title: string;
     href?: string;
+    icon?: LucideIcon;
   }
->(({ className, title, href, ...props }, ref) => {
+>(({ className, title, href, icon: Icon, ...props }, ref) => {
   return (
     <NavigationMenuLink asChild>
       <Link
         to={href || "#"}
         className={cn(
-          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground cursor-pointer",
+          "flex items-center gap-3 select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 cursor-pointer",
           className
         )}
       >
+        {Icon && (
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-orange-100 text-orange-600">
+            <Icon className="h-5 w-5" />
+          </div>
+        )}
         <div className='text-base font-medium leading-none'>{title}</div>
       </Link>
     </NavigationMenuLink>

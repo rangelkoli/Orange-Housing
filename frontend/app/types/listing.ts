@@ -8,4 +8,7 @@ export interface Listing {
     city: string;
     images: string[];
     availableDate: string;
+    typeCode?: number;  // 1 = rentals, 2 = sublets, 3 = rooms
+    location?: string;
 }
+
