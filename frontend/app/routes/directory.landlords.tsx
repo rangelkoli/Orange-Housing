@@ -6,8 +6,12 @@ import {
   Phone,
   Mail,
   Globe,
+  ArrowLeft,
+  ChevronRight,
+  Building2,
   User,
   Home,
+  Star,
   Shield,
   Calendar,
   MessageSquare,
@@ -28,85 +32,83 @@ interface LandlordItem {
   category: string;
 }
 
-export default function LandlordsPage() {
+export default function LandlordsDirectoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const landlords: LandlordItem[] = [
     {
       id: 1,
-      name: "Orange Property Management",
-      description: "Managing over 50 properties in the University Hill area. 24/7 maintenance and online tenant portal available.",
+      name: "John Smith Properties",
+      description: "Experienced landlord with over 20 years in Syracuse real estate. Specializing in student housing near SU campus with responsive maintenance.",
       neighborhoods: ["University Hill", "Westcott", "Euclid"],
-      phone: "(315) 555-3000",
-      email: "info@orangepm.com",
+      phone: "(315) 555-0101",
+      email: "john@example.com",
       website: "https://example.com",
-      yearsActive: 15,
-      propertyCount: 50,
+      yearsActive: 20,
+      propertyCount: 15,
       verified: true,
-      category: "Property Management"
+      category: "Individual Landlord"
     },
     {
       id: 2,
-      name: "Smith Family Rentals",
-      description: "Family-owned and operated since 1995. Offering well-maintained single-family homes for students and families.",
-      neighborhoods: ["Euclid", "Sedgwick", "Salt Springs"],
-      phone: "(315) 555-3100",
-      email: "smith@example.com",
-      yearsActive: 28,
-      propertyCount: 12,
+      name: "Maria Rodriguez Rentals",
+      description: "Family-owned rental business offering quality homes and apartments throughout Syracuse neighborhoods. Known for fair pricing and excellent communication.",
+      neighborhoods: ["Eastwood", "Sedgwick", "North Valley"],
+      phone: "(315) 555-0202",
+      email: "maria@example.com",
+      yearsActive: 12,
+      propertyCount: 8,
       verified: true,
-      category: "Private Landlord"
+      category: "Family Business"
     },
     {
       id: 3,
-      name: "University Area Housing",
-      description: "Specializing in affordable off-campus housing options. Studios, 1-bedroom, and shared apartments available.",
-      neighborhoods: ["University Hill", "Syracuse Univ", "Westcott"],
-      phone: "(315) 555-3200",
-      email: "uah@example.com",
+      name: "University District Landlords",
+      description: "Collective of landlords focused on providing safe, affordable housing for Syracuse University students. Online applications available.",
+      neighborhoods: ["University Hill", "Syracuse Univ", "Comstock"],
+      phone: "(315) 555-0303",
+      email: "info@udlandlords.com",
       website: "https://example.com",
-      propertyCount: 35,
+      propertyCount: 50,
       verified: true,
-      category: "Housing Agency"
+      category: "Landlord Group"
     },
     {
       id: 4,
-      name: "Elite Student Living",
-      description: "Premium rental properties with modern finishes and inclusive utility packages. Perfect for graduate students.",
-      neighborhoods: ["Comstock", "University Hill", "Downtown"],
-      phone: "(315) 555-3300",
-      email: "elite@example.com",
-      website: "https://example.com",
-      yearsActive: 10,
-      propertyCount: 20,
-      verified: true,
-      category: "Property Management"
+      name: "Thompson Family Homes",
+      description: "Third-generation Syracuse landlords. We take pride in maintaining our properties and building lasting relationships with tenants.",
+      neighborhoods: ["Tipperary Hill", "Geddes", "Westvale"],
+      phone: "(315) 555-0404",
+      email: "thompson@example.com",
+      yearsActive: 35,
+      propertyCount: 12,
+      verified: false,
+      category: "Family Business"
     },
     {
       id: 5,
-      name: "Green Homes Syracuse",
-      description: "Eco-friendly housing options with energy-efficient appliances and sustainable practices. Lower utility bills!",
-      neighborhoods: ["Meadowbrook", "Strathmore", "DeWitt"],
-      phone: "(315) 555-3400",
-      email: "green@example.com",
+      name: "Chen Housing Solutions",
+      description: "Modern apartments with updated amenities. Flexible lease terms available for graduate students and young professionals.",
+      neighborhoods: ["Downtown", "Armory Square", "Clinton Square"],
+      phone: "(315) 555-0505",
+      email: "chen@example.com",
       website: "https://example.com",
-      yearsActive: 6,
-      propertyCount: 8,
-      verified: false,
-      category: "Eco-Friendly Rentals"
+      yearsActive: 8,
+      propertyCount: 6,
+      verified: true,
+      category: "Individual Landlord"
     },
     {
       id: 6,
-      name: "Historic Hill Properties",
-      description: "Charming apartments in restored historic buildings. Experience the character of Syracuse's rich architectural heritage.",
-      neighborhoods: ["James Street", "Downtown", "Franklin Sq"],
-      phone: "(315) 555-3500",
-      email: "historic@example.com",
-      yearsActive: 22,
-      propertyCount: 15,
+      name: "Syracuse Student Housing Co-op",
+      description: "Non-profit cooperative offering affordable housing options for students. Community-focused with shared resources.",
+      neighborhoods: ["University Hill", "Meadbrook"],
+      phone: "(315) 555-0606",
+      email: "coop@example.com",
+      propertyCount: 25,
       verified: true,
-      category: "Historic Rentals"
-    }
+      category: "Housing Co-op"
+    },
   ];
 
   // Filter landlords based on search
@@ -157,16 +159,31 @@ export default function LandlordsPage() {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">
-            Landlords & Property Managers
+            Landlords Directory
           </h1>
           <p className="text-xl text-stone-300 max-w-2xl mx-auto">
-            Connect with trusted landlords and property management companies in the Syracuse area
+            Connect directly with trusted landlords in the Syracuse area
           </p>
         </div>
       </div>
 
+      {/* Add Listing CTA - Top */}
+      <div className="container mx-auto px-4 -mt-6 relative z-20 mb-6">
+        <Link
+          to="/directory/landlords/add"
+          className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+        >
+          <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+            Add Your Landlord Listing Here
+          </span>
+          <span className="block text-stone-500 text-sm mt-1">
+            List Here for 12 Months for only $100
+          </span>
+        </Link>
+      </div>
+
       {/* Search & Filter */}
-      <div className="container mx-auto px-4 -mt-6 relative z-20 mb-8">
+      <div className="container mx-auto px-4 mb-8">
         <div className="bg-white p-4 rounded-xl shadow-lg border border-stone-100 max-w-4xl mx-auto">
           <div className="relative">
             <Search
@@ -195,7 +212,7 @@ export default function LandlordsPage() {
       </div>
 
       {/* Landlords Grid */}
-      <main className="flex-grow container mx-auto px-4 pb-20">
+      <main className="flex-grow container mx-auto px-4 pb-12">
         <div className="max-w-5xl mx-auto space-y-4">
           {filteredLandlords.map((landlord) => (
             <div
@@ -339,6 +356,21 @@ export default function LandlordsPage() {
           )}
         </div>
       </main>
+
+      {/* Add Listing CTA - Bottom */}
+      <div className="container mx-auto px-4 pb-20">
+        <Link
+          to="/directory/landlords/add"
+          className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+        >
+          <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+            Add Your Landlord Listing Here
+          </span>
+          <span className="block text-stone-500 text-sm mt-1">
+            List Here for 12 Months for only $100
+          </span>
+        </Link>
+      </div>
     </div>
   );
 }

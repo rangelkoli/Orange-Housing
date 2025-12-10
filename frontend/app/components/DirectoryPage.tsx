@@ -18,9 +18,12 @@ interface DirectoryPageProps {
   title: string;
   subtitle: string;
   items: DirectoryItem[];
+  addListingLink?: string;
+  addListingText?: string;
+  isPaidListing?: boolean;
 }
 
-export function DirectoryPage({ title, subtitle, items }: DirectoryPageProps) {
+export function DirectoryPage({ title, subtitle, items, addListingLink, addListingText, isPaidListing = true }: DirectoryPageProps) {
   return (
     <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">
       
@@ -33,8 +36,27 @@ export function DirectoryPage({ title, subtitle, items }: DirectoryPageProps) {
         </div>
       </div>
 
+      {/* Add Listing CTA - Top */}
+      {addListingLink && addListingText && (
+        <div className="container mx-auto px-4 -mt-6 relative z-20 mb-6">
+          <Link
+            to={addListingLink}
+            className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+          >
+            <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+              {addListingText}
+            </span>
+            {isPaidListing && (
+              <span className="block text-stone-500 text-sm mt-1">
+                List Here for 12 Months for only $100
+              </span>
+            )}
+          </Link>
+        </div>
+      )}
+
       {/* Search & Filter */}
-      <div className="container mx-auto px-4 -mt-8 relative z-20 mb-12">
+      <div className="container mx-auto px-4 -mt-2 relative z-20 mb-12">
         <div className="bg-white p-4 rounded-xl shadow-lg border border-stone-100 max-w-4xl mx-auto flex flex-col md:flex-row gap-4">
           <div className="flex-grow relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
@@ -51,7 +73,7 @@ export function DirectoryPage({ title, subtitle, items }: DirectoryPageProps) {
       </div>
 
       {/* Directory Grid */}
-      <main className="flex-grow container mx-auto px-4 pb-20">
+      <main className="flex-grow container mx-auto px-4 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {items.map((item) => (
             <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 group flex flex-col">
@@ -101,6 +123,26 @@ export function DirectoryPage({ title, subtitle, items }: DirectoryPageProps) {
           ))}
         </div>
       </main>
+
+      {/* Add Listing CTA - Bottom */}
+      {addListingLink && addListingText && (
+        <div className="container mx-auto px-4 pb-20">
+          <Link
+            to={addListingLink}
+            className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+          >
+            <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+              {addListingText}
+            </span>
+            {isPaidListing && (
+              <span className="block text-stone-500 text-sm mt-1">
+                List Here for 12 Months for only $100
+              </span>
+            )}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
+

@@ -37,6 +37,7 @@ const SearchWidget = () => {
 
   const [selectedDate, setSelectedDate] = useState<SelectedDate | null>(null);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [locationSearch, setLocationSearch] = useState("");
   const filtersRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -62,14 +63,52 @@ const SearchWidget = () => {
   // Updated Tab Order and Labels
   const tabs = [
     { id: "Rentals", label: "Rentals" },
-    { id: "ShortTerm", label: "Short Term" },
+    { id: "ShortTerm", label: "Short-Term" },
     { id: "Sublets", label: "Sublets" },
-    { id: "RoomForRent", label: "Room For Rent" },
+    { id: "RoomForRent", label: "Rooms for Rent" },
   ];
 
   // Filter options organized by category
   const filterOptions = {
-    location: ["All", "Downtown", "Suburbs", "Uptown", "Waterfront"],
+    location: [
+      "All",
+      "Armory Square",
+      "Brighton",
+      "Camillus",
+      "Cicero",
+      "Clay",
+      "Clinton Square",
+      "DeWitt",
+      "Downtown",
+      "East Syracuse",
+      "Eastwood",
+      "Elbridge",
+      "Fabius",
+      "Fayetteville",
+      "Franklin Sq",
+      "Geddes",
+      "Inner Harbor",
+      "Jamesville",
+      "Lafayette",
+      "Liverpool",
+      "Manlius",
+      "Marcellus",
+      "Meadbrook",
+      "Near Micron",
+      "North Valley",
+      "Onondaga Hill",
+      "Outer Comstock",
+      "Pompey",
+      "Salt Springs",
+      "Sedgwick",
+      "South Valley",
+      "Strathmore",
+      "Syracuse Univ",
+      "Tipperary Hill",
+      "University Hill",
+      "Westcott",
+      "Westvale",
+    ],
     buildingType: [
       "Building Type - All",
       "Apartment Complex",
@@ -86,6 +125,11 @@ const SearchWidget = () => {
     ],
     furnished: ["All", "Furnished", "Unfurnished", "Partial"],
   };
+
+  // Filter locations based on search
+  const filteredLocations = filterOptions.location.filter((loc) =>
+    loc.toLowerCase().includes(locationSearch.toLowerCase())
+  );
 
   const handleReset = () => {
     setFilters({
@@ -230,13 +274,16 @@ const SearchWidget = () => {
 
         {/* Drill Down Filters Row */}
         <div className='grid grid-cols-12 gap-3 mb-6' ref={filtersRef}>
-          {/* Location Dropdown */}
+          {/* Location Dropdown with Search */}
           <div className='relative col-span-12 md:col-span-4 lg:col-span-3'>
             <label className='block text-xs font-medium text-gray-500 mb-1.5 ml-1 font-sans tracking-wide uppercase'>
               Location
             </label>
             <button
-              onClick={() => toggleDropdown("location")}
+              onClick={() => {
+                toggleDropdown("location");
+                setLocationSearch("");
+              }}
               className='w-full flex items-center justify-between bg-white border border-gray-200 hover:border-gray-300 text-gray-700 px-3 py-2.5 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 active:bg-gray-50 group'
             >
               <span className='truncate text-sm font-medium text-gray-900 font-mono group-hover:text-orange-600 transition-colors'>
@@ -249,15 +296,43 @@ const SearchWidget = () => {
             </button>
             {activeDropdown === "location" && (
               <div className='absolute top-full left-0 w-full mt-1 bg-white border border-gray-100 rounded-lg shadow-lg z-20'>
-                {filterOptions.location.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => handleOptionSelect("location", opt)}
-                    className='w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer first:rounded-t-lg last:rounded-b-lg'
-                  >
-                    {opt}
-                  </button>
-                ))}
+                {/* Search Input */}
+                <div className='p-2 border-b border-gray-100'>
+                  <div className='relative'>
+                    <Search size={14} className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400' />
+                    <input
+                      type='text'
+                      placeholder='Search neighborhoods...'
+                      value={locationSearch}
+                      onChange={(e) => setLocationSearch(e.target.value)}
+                      className='w-full pl-8 pr-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500'
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                {/* Scrollable Options */}
+                <div className='max-h-60 overflow-y-auto'>
+                  {filteredLocations.length > 0 ? (
+                    filteredLocations.map((opt) => (
+                      <button
+                        key={opt}
+                        onClick={() => {
+                          handleOptionSelect("location", opt);
+                          setLocationSearch("");
+                        }}
+                        className={`w-full text-left px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 font-mono cursor-pointer ${
+                          filters.location === opt ? 'bg-orange-50 text-orange-600' : ''
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))
+                  ) : (
+                    <div className='px-4 py-3 text-sm text-gray-500 text-center'>
+                      No neighborhoods found
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

@@ -85,6 +85,7 @@ export function Footer() {
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Cheap Houses Near Me</Link></li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Luxury Apartments</Link></li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Pet Friendly Apartments</Link></li>
+                <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Housing and Apartments near Micron</Link></li>
               </ul>
             </div>
             
@@ -141,8 +142,8 @@ export function Footer() {
               <ul className='space-y-4 text-stone-600 text-sm'>
                 <li className="flex flex-col gap-1">
                   <span className="font-semibold text-stone-900">Contact Us</span>
-                  <a href="mailto:support@orangehousing.com" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>Email Us</a>
-                  <a href="tel:3152634621" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>(315) 263-4621</a>
+                  <a href="mailto:Donna@orangehousing.com" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>Email Us</a>
+                  <a href="tel:+1" className='hover:text-[#EB7B07] transition-colors font-mono text-xs'>Call Us</a>
                 </li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>Avoid Scams</Link></li>
                 <li><Link to='#' className='hover:text-[#EB7B07] transition-colors'>List a Property</Link></li>

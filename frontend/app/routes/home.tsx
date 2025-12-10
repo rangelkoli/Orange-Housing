@@ -77,7 +77,7 @@ function Hero() {
         <div className='relative z-20 container mx-auto px-4 max-w-5xl pointer-events-none'>
           <div className="pointer-events-auto">
             <h1 className="text-balance text-center mb-8 tracking-tight font-serif text-[40px] leading-[1.2] text-[#292524] font-normal -tracking-[0.02em]">
-              Find Your Perfect
+              Find Your
               <span className="relative inline-block mx-2 text-[#FF5B04] italic cursor-pointer hover:text-orange-700
                 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
                 after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
@@ -87,12 +87,12 @@ function Hero() {
                 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
                 after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
                 Apartment,
-              </span> or
+              </span>or
               <span className="relative inline-block mx-2 text-[#FF5B04] italic cursor-pointer hover:text-orange-700
                 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-current
                 after:transition-all after:duration-300 after:ease-in-out hover:after:w-full">
                 Room
-              </span>for Rent in Syracuse, NY
+              </span>for Rent in Syracuse, New York
             </h1>
             <SearchWidget />
           </div>
@@ -168,13 +168,13 @@ function FeaturedHomeCard({ home }: { home: any }) {
           >
             <ArrowRightLeft size={20} className="group-hover/compare:scale-110 transition-transform" />
           </button>
-          <button 
-            onClick={(e) => { e.stopPropagation(); }}
-            className='p-2 bg-white/90 backdrop-blur-sm rounded-full text-stone-400 hover:text-red-500 transition-colors shadow-sm group/heart' 
-            title="Save"
-          >
-            <Heart size={20} className="group-hover/heart:scale-110 transition-transform" />
-          </button>
+        </div>
+
+        {/* Category Badge */}
+        <div className="absolute top-4 left-4 z-20">
+          <span className="bg-orange-600 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full shadow-sm">
+            {home.category || 'Rental'}
+          </span>
         </div>
 
         {/* Availability Banner */}
@@ -182,7 +182,7 @@ function FeaturedHomeCard({ home }: { home: any }) {
           <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-tr-lg shadow-sm flex items-center gap-2 border border-stone-100">
             <Calendar size={14} className="text-orange-600" />
             <span className="text-xs font-semibold text-stone-800 uppercase tracking-wide font-mono">
-              Available {home.availableDate}
+              Available {home.availableFullDate || home.availableDate}
             </span>
           </div>
         </div>
@@ -199,10 +199,13 @@ function FeaturedHomeCard({ home }: { home: any }) {
       </div>
       <div className='p-6 flex flex-col gap-4'>
         <div>
-          <div className="flex justify-between items-start mb-2">
-            <h3 className='text-xl font-bold text-stone-900 tracking-tight line-clamp-1 font-serif'>
+          <div className="flex justify-between items-start mb-2 gap-2">
+            <h3 className='text-lg font-bold text-stone-900 tracking-tight line-clamp-1 font-serif'>
               {home.title}
             </h3>
+            <span className="text-[10px] font-semibold text-stone-500 uppercase tracking-wide whitespace-nowrap bg-stone-100 px-2 py-0.5 rounded">
+              {home.category || 'Rental'}
+            </span>
           </div>
           
           <div className='flex items-start gap-2 text-stone-500'>
@@ -259,7 +262,9 @@ function FeaturedHomes() {
       sqft: "2,400",
       address: "454 Serenity Lane",
       city: "Syracuse, NY 13202",
+      category: "Rental",
       availableDate: "Aug 1",
+      availableFullDate: "08/01/2025",
       images: [
         "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1000&auto=format&fit=crop",
@@ -275,7 +280,9 @@ function FeaturedHomes() {
       sqft: "1,800",
       address: "122 Elmwood Residences",
       city: "Syracuse, NY 13207",
+      category: "Short-Term",
       availableDate: "Sep 15",
+      availableFullDate: "09/15/2025",
       images: [
         "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1000&auto=format&fit=crop",
@@ -291,7 +298,9 @@ function FeaturedHomes() {
       sqft: "850",
       address: "789 Community Court",
       city: "Syracuse, NY 13210",
+      category: "Room for Rent",
       availableDate: "Now",
+      availableFullDate: "Available Now",
       images: [
         "https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1554995207-c18c203602cb?q=80&w=1000&auto=format&fit=crop",
@@ -307,7 +316,9 @@ function FeaturedHomes() {
       sqft: "4,200",
       address: "121 Evergreen Estate",
       city: "Syracuse, NY 13224",
+      category: "Rental",
       availableDate: "Oct 1",
+      availableFullDate: "10/01/2025",
       images: [
         "https://images.unsplash.com/photo-1600596542815-27b88e35eabb?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1000&auto=format&fit=crop",
@@ -323,7 +334,9 @@ function FeaturedHomes() {
       sqft: "1,500",
       address: "321 Lakeside Lofts",
       city: "Syracuse, NY 13204",
+      category: "Sublet",
       availableDate: "Aug 15",
+      availableFullDate: "08/15/2025",
       images: [
         "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1600573472592-401b489a3cdc?q=80&w=1000&auto=format&fit=crop",
@@ -339,7 +352,9 @@ function FeaturedHomes() {
       sqft: "2,100",
       address: "555 Willow Creek Dr",
       city: "Syracuse, NY 13207",
+      category: "Rental",
       availableDate: "Nov 1",
+      availableFullDate: "11/01/2025",
       images: [
         "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
         "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?q=80&w=1000&auto=format&fit=crop",
@@ -353,7 +368,7 @@ function FeaturedHomes() {
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
           <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
-            Featured Syracuse Apartments & Homes
+            Featured Syracuse, NY Apartments, Homes, & Rooms for Rent
           </h2>
           <p className='text-stone-600 max-w-2xl mx-auto'>
             Explore our top-rated listings including spacious family homes,
@@ -412,13 +427,17 @@ function LocalAds() {
     <section className='py-32 bg-white'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
-            Trusted Local Syracuse Businesses
-          </h2>
-          <p className='text-stone-600'>
-            Connect with top-rated local movers, cleaners, and shops to make
-            your move to Syracuse seamless.
-          </p>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+            <h2 className='text-3xl md:text-4xl font-bold text-stone-900 font-serif'>
+              Support our Local Syracuse Businesses
+            </h2>
+            <Link 
+              to="/directory/local-businesses/add"
+              className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center gap-1 border border-orange-200 rounded-full px-4 py-1.5 hover:bg-orange-50 transition-colors"
+            >
+              Add Your Business Here
+            </Link>
+          </div>
         </div>
 
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto'>
@@ -474,14 +493,14 @@ function Testimonials() {
   const reviews = [
     {
       id: 1,
-      name: "Sarah Jenkins",
+      name: "Sarah J.",
       role: "Syracuse University Student",
       text: "Orange Housing made finding my off-campus apartment so easy. The landlords are verified and the listings are actually real. Highly recommend for any SU student!",
       date: "2 months ago",
     },
     {
       id: 2,
-      name: "Michael Chen",
+      name: "Michael C.",
       role: "Young Professional",
       text: "I moved to Syracuse for a job at Upstate Medical and didn't know the area. This site helped me find a great loft in downtown that was within my budget. The 'Perfect For' filter is a lifesaver.",
       date: "1 month ago",
@@ -502,7 +521,7 @@ function Testimonials() {
     },
     {
       id: 5,
-      name: "David Ross",
+      name: "David R.",
       role: "Local Resident",
       text: "I've lived in Syracuse for 10 years and this is by far the best rental platform. It really highlights the best parts of our city.",
       date: "4 months ago",
@@ -514,11 +533,11 @@ function Testimonials() {
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
           <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
-            Loved by the Syracuse Community
+            Google Reviews & Testimonials by the Syracuse Community
           </h2>
           <p className='text-stone-600 max-w-2xl mx-auto'>
             Don't just take our word for it. See what students, professionals,
-            and families are saying about their experience with Orange Housing.
+            and families are saying about their experience with OrangeHousing.com
           </p>
         </div>
 
@@ -716,12 +735,19 @@ function Partners() {
     <section className='py-32 bg-white'>
       <div className='container mx-auto px-4'>
         <div className='text-center mb-16'>
-          <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
-            Our Syracuse Community Partners
-          </h2>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
+            <h2 className='text-3xl md:text-4xl font-bold text-stone-900 font-serif'>
+              Team Syracuse
+            </h2>
+            <Link 
+              to="/directory/team-syracuse/add"
+              className="text-orange-600 hover:text-orange-700 font-medium text-sm flex items-center gap-1 border border-orange-200 rounded-full px-4 py-1.5 hover:bg-orange-50 transition-colors"
+            >
+              Join Team Syracuse
+            </Link>
+          </div>
           <p className='text-stone-600 max-w-2xl mx-auto'>
-            We collaborate with local organizations to strengthen the Syracuse
-            housing community.
+            Stronger Together: OrangeHousing.com & Local Partners Team Up to Promote & Support Each Other Daily.
           </p>
         </div>
 
@@ -816,8 +842,7 @@ function Blog() {
               Syracuse Housing & Lifestyle Blog
             </h2>
             <p className='text-stone-600'>
-              Expert tips on finding apartments, neighborhood guides, and living
-              in Syracuse, NY.
+              Syracuse Insights: Fast Tips and Community News from Local Residents
             </p>
           </div>
           <Link

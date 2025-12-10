@@ -105,12 +105,12 @@ export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
 // Default navigation links
 const defaultNavigationLinks: Navbar02NavItem[] = [
   {
-    label: "PROPERTIES",
-    icon: Building2,
+    label: "RENTALS",
+    icon: Home,
     submenu: true,
     items: [
-      { href: "/listings", label: "All Properties", icon: Building2 },
       { href: "/rentals", label: "Rentals", icon: Home },
+      { href: "/short-term", label: "Short-Term", icon: Building2 },
       { href: "/sublets", label: "Sublets", icon: ArrowRightLeft },
       { href: "/rooms", label: "Rooms for Rent", icon: Users },
     ],
@@ -120,19 +120,13 @@ const defaultNavigationLinks: Navbar02NavItem[] = [
     icon: Building,
     submenu: true,
     items: [
-      { href: "/directory/complex", label: "Apartment Complex", icon: Building },
-      { href: "/directory/business", label: "Business Directory", icon: Store },
-      {
-        href: "/directory/landlords",
-        label: "Landlords and Property Managers",
-        icon: Contact,
-      },
+      { href: "/directory/apartment-complexes", label: "Apartment Complexes", icon: Building },
+      { href: "/directory/landlords", label: "Landlords", icon: Contact },
+      { href: "/directory/property-managers", label: "Property Managers", icon: Building2 },
+      { href: "/directory/local-businesses", label: "Local Businesses", icon: Store },
+      { href: "/directory/nonprofits", label: "Syracuse NonProfits/Charity", icon: Users },
+      { href: "/directory/team-syracuse", label: "Team Syracuse", icon: Medal },
     ],
-  },
-  {
-    label: "TEAM SYRACUSE",
-    href: "/team-syracuse",
-    icon: Medal,
   },
   {
     label: "BUY",
