@@ -15,6 +15,7 @@ import {
 import { FaPhone } from "react-icons/fa";
 import type { Listing } from "../types/listing";
 import { getListingDetailUrl } from "../utils/listingSlug";
+import { useFavoritesStore } from "../stores/favoritesStore";
 
 interface ListingCardProps {
   home: Listing;
@@ -25,6 +26,8 @@ const ListingCard: React.FC<ListingCardProps> = ({ home, layout = 'grid' }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const isList = layout === 'list';
+  const { toggleFavorite, isFavorite } = useFavoritesStore();
+  const isHomeFavorite = isFavorite(home.id);
 
   const handleCardClick = () => {
     const url = getListingDetailUrl(home);
@@ -159,11 +162,14 @@ const ListingCard: React.FC<ListingCardProps> = ({ home, layout = 'grid' }) => {
               <ArrowRightLeft size={20} className="group-hover/compare:scale-110 transition-transform" />
             </button>
             <button 
-              onClick={(e) => { e.stopPropagation(); }}
-              className='p-2 bg-white/90 backdrop-blur-sm rounded-full text-stone-400 hover:text-red-500 transition-colors shadow-sm group/heart' 
-              title="Save"
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                toggleFavorite(home);
+              }}
+              className={`p-2 bg-white/90 backdrop-blur-sm rounded-full transition-colors shadow-sm group/heart ${isHomeFavorite ? 'text-red-500' : 'text-stone-400 hover:text-red-500'}`}
+              title={isHomeFavorite ? "Remove from favorites" : "Add to favorites"}
             >
-              <Heart size={20} className="group-hover/heart:scale-110 transition-transform" />
+              <Heart size={20} className={`group-hover/heart:scale-110 transition-transform ${isHomeFavorite ? 'fill-current' : ''}`} />
             </button>
         </div>
       </div>
@@ -217,11 +223,14 @@ const ListingCard: React.FC<ListingCardProps> = ({ home, layout = 'grid' }) => {
             <ArrowRightLeft size={20} className="group-hover/compare:scale-110 transition-transform" />
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); }}
-            className='p-2 bg-white/90 backdrop-blur-sm rounded-full text-stone-400 hover:text-red-500 transition-colors shadow-sm group/heart' 
-            title="Save"
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              toggleFavorite(home);
+            }}
+            className={`p-2 bg-white/90 backdrop-blur-sm rounded-full transition-colors shadow-sm group/heart ${isHomeFavorite ? 'text-red-500' : 'text-stone-400 hover:text-red-500'}`}
+            title={isHomeFavorite ? "Remove from favorites" : "Add to favorites"}
           >
-            <Heart size={20} className="group-hover/heart:scale-110 transition-transform" />
+            <Heart size={20} className={`group-hover/heart:scale-110 transition-transform ${isHomeFavorite ? 'fill-current' : ''}`} />
           </button>
         </div>
 

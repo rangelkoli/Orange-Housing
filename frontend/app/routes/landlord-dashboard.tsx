@@ -1,22 +1,20 @@
 import { LandlordSidebar } from "../components/LandlordSidebar";
+import { RequireAuth } from "../components/RequireAuth";
+import { useAuthStore } from "../stores/authStore";
 import { Search, Bell, HelpCircle, Filter, ArrowUpDown, Edit2, Eye, RefreshCw } from "lucide-react";
 
 export default function LandlordDashboard() {
-  // Mock Data
-  const stats = [
-    { label: "Active Listings", value: "12", change: "+1 this month", positive: true },
-    { label: "Pending Applications", value: "5", change: "+2 this week", positive: true },
-    { label: "Total Views This Month", value: "1,204", change: "+15%", positive: true },
-    { label: "Occupancy Rate", value: "92%", change: "-2%", positive: false },
-  ];
+  const { user } = useAuthStore();
+  const userName = user?.firstName || user?.username || user?.email?.split('@')[0] || 'User';
+  const userCompany = user?.company || 'Landlord Account';
 
   const listings = [
     {
       id: 1,
       image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=1000&auto=format&fit=crop",
+      title: "Spacious 3BR Near Campus",
       address: "123 Main Street",
       city: "Syracuse, NY 13202",
-      status: "Listed",
       rent: "$1,500/mo",
       views: 245,
       applications: 3,
@@ -24,9 +22,9 @@ export default function LandlordDashboard() {
     {
       id: 2,
       image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1000&auto=format&fit=crop",
+      title: "Modern Studio Apartment",
       address: "456 Oak Avenue, Apt 5B",
       city: "Syracuse, NY 13210",
-      status: "Rented",
       rent: "$1,200/mo",
       views: "N/A",
       applications: "N/A",
@@ -34,9 +32,9 @@ export default function LandlordDashboard() {
     {
       id: 3,
       image: "https://images.unsplash.com/photo-1560184897-ae75f418493e?q=80&w=1000&auto=format&fit=crop",
+      title: "Luxury 4BR Townhouse",
       address: "789 Pine Street",
       city: "Syracuse, NY 13205",
-      status: "Listed",
       rent: "$2,100/mo",
       views: 189,
       applications: 1,
@@ -44,6 +42,7 @@ export default function LandlordDashboard() {
   ];
 
   return (
+    <RequireAuth>
     <div className="min-h-screen bg-[#F5F7FA] font-sans text-stone-900 flex">
       <LandlordSidebar />
 
@@ -77,8 +76,8 @@ export default function LandlordDashboard() {
                 className="w-10 h-10 rounded-full object-cover border border-stone-200"
               />
               <div className="hidden md:block">
-                <div className="text-sm font-bold text-stone-900">John Doe</div>
-                <div className="text-xs text-stone-500">Syracuse Realty</div>
+                <div className="text-sm font-bold text-stone-900">{userName}</div>
+                <div className="text-xs text-stone-500">{userCompany}</div>
               </div>
             </div>
           </div>
@@ -87,20 +86,7 @@ export default function LandlordDashboard() {
         <div className="p-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-stone-900 mb-2">Dashboard</h1>
-            <p className="text-stone-500">Welcome back, John! Here's a summary of your properties.</p>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            {stats.map((stat, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-xl border border-stone-100 shadow-sm">
-                <div className="text-stone-500 text-sm font-medium mb-2">{stat.label}</div>
-                <div className="text-3xl font-bold text-stone-900 mb-2">{stat.value}</div>
-                <div className={`text-sm font-medium ${stat.positive ? 'text-green-600' : 'text-red-600'}`}>
-                  {stat.change}
-                </div>
-              </div>
-            ))}
+            <p className="text-stone-500">Welcome back, {userName}! Here's a summary of your properties.</p>
           </div>
 
           {/* Listings Table Section */}
@@ -122,8 +108,8 @@ export default function LandlordDashboard() {
                 <table className="w-full">
                   <thead>
                     <tr className="bg-stone-50 border-b border-stone-100 text-left">
-                      <th className="py-4 px-6 text-sm font-semibold text-stone-500 w-[40%]">Property</th>
-                      <th className="py-4 px-6 text-sm font-semibold text-stone-500">Status</th>
+                      <th className="py-4 px-6 text-sm font-semibold text-stone-500">Property</th>
+                      <th className="py-4 px-6 text-sm font-semibold text-stone-500">Address</th>
                       <th className="py-4 px-6 text-sm font-semibold text-stone-500">Rent</th>
                       <th className="py-4 px-6 text-sm font-semibold text-stone-500">Views</th>
                       <th className="py-4 px-6 text-sm font-semibold text-stone-500">Applications</th>
@@ -135,21 +121,13 @@ export default function LandlordDashboard() {
                       <tr key={listing.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-50/50 transition-colors">
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-4">
-                            <img src={listing.image} alt={listing.address} className="w-16 h-12 rounded-lg object-cover" />
-                            <div>
-                              <div className="font-bold text-stone-900">{listing.address}</div>
-                              <div className="text-stone-500 text-sm">{listing.city}</div>
-                            </div>
+                            <img src={listing.image} alt={listing.title} className="w-16 h-12 rounded-lg object-cover" />
+                            <div className="font-bold text-stone-900">{listing.title}</div>
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            listing.status === 'Listed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {listing.status}
-                          </span>
+                          <div className="text-stone-900">{listing.address}</div>
+                          <div className="text-stone-500 text-sm">{listing.city}</div>
                         </td>
                         <td className="py-4 px-6 font-medium text-stone-900">{listing.rent}</td>
                         <td className="py-4 px-6 text-stone-600">{listing.views}</td>
@@ -177,5 +155,6 @@ export default function LandlordDashboard() {
         </div>
       </main>
     </div>
+    </RequireAuth>
   );
 }

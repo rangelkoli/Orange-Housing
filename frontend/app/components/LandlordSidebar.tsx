@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { 
   LayoutDashboard, 
   Building2, 
@@ -11,11 +11,26 @@ import {
   Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "../stores/authStore";
+
 
 
 export function LandlordSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
   const isActive = (path: string) => location.pathname === path;
+
+  // Generate user initials for avatar
+  const userInitials = user?.firstName && user?.lastName
+    ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
+    : user?.email?.[0]?.toUpperCase() || 'U';
+  const userName = user?.company || user?.firstName || user?.email?.split('@')[0] || 'Landlord';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/', { replace: true });
+  };
 
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/landlord/dashboard" },
@@ -30,10 +45,10 @@ export function LandlordSidebar() {
       <div className="p-6 border-b border-stone-100">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600 font-bold text-xl">
-            SR
+            {userInitials}
           </div>
           <div>
-            <h2 className="font-bold text-stone-900 leading-tight">Syracuse Realty</h2>
+            <h2 className="font-bold text-stone-900 leading-tight">{userName}</h2>
             <p className="text-xs text-stone-500">Landlord Account</p>
           </div>
         </div>
@@ -82,13 +97,13 @@ export function LandlordSidebar() {
             <Settings size={20} />
             Settings
           </Link>
-          <Link
-            to="/"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-stone-600 hover:bg-red-50 hover:text-red-600 transition-colors"
           >
             <LogOut size={20} />
             Logout
-          </Link>
+          </button>
         </nav>
       </div>
 

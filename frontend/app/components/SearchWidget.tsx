@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import {
   Search,
   ChevronDown,
@@ -8,15 +8,17 @@ import {
   Bed,
   DollarSign,
   CalendarDays,
-  Map,
   PawPrint,
   Armchair,
   Heart,
 } from "lucide-react";
 import { Calendar } from "./ui/calendar";
+import { useFavoritesStore } from "../stores/favoritesStore";
 
 const SearchWidget = () => {
   const navigate = useNavigate();
+  const { favorites } = useFavoritesStore();
+  const favoritesCount = favorites.length;
   const [activeTab, setActiveTab] = useState("Rentals");
   const [filters, setFilters] = useState({
     location: "All",
@@ -253,22 +255,23 @@ const SearchWidget = () => {
             })}
           </div>
 
-          {/* Right Side Buttons (Map View & Favorites) */}
-          <div className='hidden sm:flex items-center gap-6'>
-            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group font-mono'>
-              <Map
-                size={18}
-                className='group-hover:scale-110 transition-transform'
-              />
-              <span>Map View</span>
-            </button>
-            <button className='flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group font-mono'>
+          {/* Right Side Button (Favorites) */}
+          <div className='flex items-center'>
+            <Link 
+              to="/favorites"
+              className='relative flex items-center gap-2 text-gray-500 hover:text-orange-600 font-medium text-sm transition-colors group font-mono no-underline'
+            >
               <Heart
                 size={18}
-                className='group-hover:scale-110 transition-transform'
+                className={`group-hover:scale-110 transition-transform ${favoritesCount > 0 ? 'fill-red-500 text-red-500' : ''}`}
               />
               <span>Favorites</span>
-            </button>
+              {favoritesCount > 0 && (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {favoritesCount > 9 ? "9+" : favoritesCount}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
 
@@ -538,8 +541,9 @@ const SearchWidget = () => {
         </div>
 
         {/* Search Input Row */}
-        <div className='relative flex items-center gap-2 mb-4'>
-          <div className='relative grow group'>
+        <div className='flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4'>
+          {/* Search Input - Full width on mobile */}
+          <div className='relative w-full sm:flex-1 group'>
             <div className='absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none'>
               <Search
                 size={20}
@@ -556,22 +560,24 @@ const SearchWidget = () => {
             />
           </div>
 
-          {/* Search and Reset Buttons */}
-          <button 
-            onClick={handleSearch}
-            className='flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm font-sans tracking-tight'
-          >
-            <Search size={18} />
-            Search
-          </button>
+          {/* Search and Reset Buttons - Row below on mobile, inline on desktop */}
+          <div className='flex items-center gap-2'>
+            <button 
+              onClick={handleSearch}
+              className='flex-1 sm:flex-none flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm font-sans tracking-tight'
+            >
+              <Search size={18} />
+              Search
+            </button>
 
-          <button
-            onClick={handleReset}
-            className='flex items-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm bg-white hover:bg-gray-50 font-sans tracking-tight'
-          >
-            <RefreshCw size={18} />
-            Reset
-          </button>
+            <button
+              onClick={handleReset}
+              className='flex-1 sm:flex-none flex items-center justify-center gap-2 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 px-6 py-3.5 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 font-medium text-sm bg-white hover:bg-gray-50 font-sans tracking-tight'
+            >
+              <RefreshCw size={18} />
+              Reset
+            </button>
+          </div>
         </div>
       </div>
     </div>

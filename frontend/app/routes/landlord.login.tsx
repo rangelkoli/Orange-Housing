@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { Eye, EyeOff, Building2, Mail, Lock, ArrowRight, CheckCircle2, Shield, AlertTriangle, X } from "lucide-react";
+import { useAuthStore } from "../stores/authStore";
 
 // Password Update Modal Component
 interface PasswordUpdateModalProps {
@@ -211,6 +212,8 @@ function SuccessToast({ message, onClose }: { message: string; onClose: () => vo
 
 export default function LandlordLogin() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login, isAuthenticated } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -223,6 +226,19 @@ export default function LandlordLogin() {
   const [showPasswordUpdateModal, setShowPasswordUpdateModal] = useState(false);
   const [pendingUser, setPendingUser] = useState<any>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const returnUrl = searchParams.get("returnUrl");
+      navigate(returnUrl ? decodeURIComponent(returnUrl) : "/landlord/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate, searchParams]);
+
+  const getReturnUrl = () => {
+    const returnUrl = searchParams.get("returnUrl");
+    return returnUrl ? decodeURIComponent(returnUrl) : "/landlord/dashboard";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -253,11 +269,18 @@ export default function LandlordLogin() {
         return;
       }
 
-      // Store user info
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // Store user info in persistent auth store
+      login({
+        id: data.user.id,
+        email: data.user.email,
+        username: data.user.username,
+        firstName: data.user.first_name,
+        lastName: data.user.last_name,
+        company: data.user.company,
+      });
       
-      // Redirect to dashboard
-      navigate("/landlord/dashboard");
+      // Redirect to returnUrl or dashboard
+      navigate(getReturnUrl());
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -269,25 +292,40 @@ export default function LandlordLogin() {
     setShowPasswordUpdateModal(false);
     setShowSuccessToast(true);
     
-    // Store user info and redirect after a brief delay
+    // Store user info in persistent auth store and redirect after a brief delay
     if (pendingUser) {
-      localStorage.setItem("user", JSON.stringify(pendingUser));
+      login({
+        id: pendingUser.id,
+        email: pendingUser.email,
+        username: pendingUser.username,
+        firstName: pendingUser.first_name,
+        lastName: pendingUser.last_name,
+        company: pendingUser.company,
+      });
     }
     
     setTimeout(() => {
-      navigate("/landlord/dashboard");
+      navigate(getReturnUrl());
     }, 1500);
   };
 
   const handleSkipPasswordUpdate = () => {
     setShowPasswordUpdateModal(false);
     
-    // Store user info and redirect (even without updating password)
+    // Store user info in persistent auth store and redirect (even without updating password)
     if (pendingUser) {
-      localStorage.setItem("user", JSON.stringify(pendingUser));
+      login({
+        id: pendingUser.id,
+        email: pendingUser.email,
+        username: pendingUser.username,
+        firstName: pendingUser.first_name,
+        lastName: pendingUser.last_name,
+        company: pendingUser.company,
+      });
     }
-    navigate("/landlord/dashboard");
+    navigate(getReturnUrl());
   };
+
 
   return (
     <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">

@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, Lock, ArrowLeft, Shield, CheckCircle2, AlertCircle } from "lucide-react";
+import { RequireAuth } from "../components/RequireAuth";
+import { useAuthStore } from "../stores/authStore";
 
 export default function ChangePassword() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
@@ -16,16 +18,6 @@ export default function ChangePassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // Check if user is logged in
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      navigate("/landlord/login");
-      return;
-    }
-    setUser(JSON.parse(storedUser));
-  }, [navigate]);
 
   const validatePassword = (password: string) => {
     const checks = {
@@ -77,7 +69,7 @@ export default function ChangePassword() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.id,
+          userId: user?.id,
           oldPassword: formData.oldPassword,
           newPassword: formData.newPassword,
         }),
@@ -106,11 +98,8 @@ export default function ChangePassword() {
   const passwordChecks = validatePassword(formData.newPassword);
   const passwordStrength = getPasswordStrength(formData.newPassword);
 
-  if (!user) {
-    return null;
-  }
-
   return (
+    <RequireAuth>
     <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900">
       <main className="max-w-2xl mx-auto py-12 px-4">
         {/* Back Link */}
@@ -154,7 +143,7 @@ export default function ChangePassword() {
                 {/* User Info */}
                 <div className="mb-6 p-4 bg-stone-50 rounded-xl">
                   <p className="text-sm text-stone-500">Logged in as</p>
-                  <p className="font-medium text-stone-900">{user.email}</p>
+                  <p className="font-medium text-stone-900">{user?.email}</p>
                 </div>
 
                 {error && (
@@ -315,5 +304,6 @@ export default function ChangePassword() {
         </div>
       </main>
     </div>
+    </RequireAuth>
   );
 }

@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { ChevronLeft, Upload, Calendar, MapPin, Check, PawPrint, Sofa, WashingMachine, Car, Flame, Droplets, Wifi, Zap, Snowflake, Trash2, Tv, Wind } from "lucide-react";
+import { RequireAuth } from "../components/RequireAuth";
 
 export default function CreateListingPage() {
   const [step, setStep] = useState(1);
 
   return (
+    <RequireAuth>
     <div className="min-h-screen bg-[#F5F7FA] font-sans text-stone-900">
       {/* Header */}
       <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
@@ -448,5 +450,6 @@ export default function CreateListingPage() {
         </form>
       </main>
     </div>
+    </RequireAuth>
   );
 }

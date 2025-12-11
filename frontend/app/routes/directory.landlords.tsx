@@ -171,20 +171,20 @@ export default function LandlordsDirectoryPage() {
       <div className="container mx-auto px-4 -mt-6 relative z-20 mb-6">
         <Link
           to="/directory/landlords/add"
-          className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+          className="block max-w-4xl mx-auto w-full py-3 md:py-4 px-4 md:px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
         >
-          <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+          <span className="text-orange-600 font-semibold text-base md:text-lg group-hover:text-orange-700">
             Add Your Landlord Listing Here
           </span>
-          <span className="block text-stone-500 text-sm mt-1">
+          <span className="block text-stone-500 text-xs md:text-sm mt-1">
             List Here for 12 Months for only $100
           </span>
         </Link>
       </div>
 
       {/* Search & Filter */}
-      <div className="container mx-auto px-4 mb-8">
-        <div className="bg-white p-4 rounded-xl shadow-lg border border-stone-100 max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 mb-6 md:mb-8">
+        <div className="bg-white p-3 md:p-4 rounded-xl shadow-lg border border-stone-100 max-w-4xl mx-auto">
           <div className="relative">
             <Search
               className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400"
@@ -195,7 +195,7 @@ export default function LandlordsDirectoryPage() {
               placeholder="Search by landlord name, neighborhood, or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+              className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm md:text-base"
             />
           </div>
         </div>
@@ -219,14 +219,14 @@ export default function LandlordsDirectoryPage() {
               key={landlord.id}
               className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-stone-100"
             >
-              <div className="p-6">
-                <div className="flex flex-col md:flex-row gap-6">
+              <div className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <div
-                      className={`w-20 h-20 ${getAvatarColor(
+                      className={`w-16 h-16 md:w-20 md:h-20 ${getAvatarColor(
                         landlord.name
-                      )} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-md`}
+                      )} rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-md`}
                     >
                       {getInitials(landlord.name)}
                     </div>
@@ -234,42 +234,42 @@ export default function LandlordsDirectoryPage() {
 
                   {/* Main Content */}
                   <div className="flex-grow">
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-3">
+                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3 mb-3">
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-xl font-bold text-stone-900 font-serif">
+                          <h3 className="text-lg md:text-xl font-bold text-stone-900 font-serif">
                             {landlord.name}
                           </h3>
                           {landlord.verified && (
-                            <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
-                              <Shield size={12} />
+                            <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] md:text-xs font-semibold px-1.5 md:px-2 py-0.5 rounded-full">
+                              <Shield size={10} />
                               Verified
                             </span>
                           )}
                         </div>
-                        <span className="text-sm text-orange-600 font-medium">
+                        <span className="text-xs md:text-sm text-orange-600 font-medium">
                           {landlord.category}
                         </span>
                       </div>
 
                       {/* Stats */}
-                      <div className="flex items-center gap-4 text-sm text-stone-500">
+                      <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-stone-500">
                         {landlord.yearsActive && (
                           <div className="flex items-center gap-1">
-                            <Calendar size={14} className="text-stone-400" />
-                            <span>{landlord.yearsActive} years</span>
+                            <Calendar size={12} className="text-stone-400" />
+                            <span>{landlord.yearsActive} yrs</span>
                           </div>
                         )}
                         {landlord.propertyCount && (
                           <div className="flex items-center gap-1">
-                            <Home size={14} className="text-stone-400" />
+                            <Home size={12} className="text-stone-400" />
                             <span>{landlord.propertyCount} properties</span>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-stone-600 text-sm mb-4 leading-relaxed">
+                    <p className="text-stone-600 text-xs md:text-sm mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
                       {landlord.description}
                     </p>
 
@@ -292,23 +292,23 @@ export default function LandlordsDirectoryPage() {
                     </div>
 
                     {/* Contact Buttons */}
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
                       {landlord.phone && (
                         <a
                           href={`tel:${landlord.phone}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
+                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
                         >
-                          <FaPhone size={12} />
-                          Call
+                          <FaPhone size={10} />
+                          <span>Call Now</span>
                         </a>
                       )}
                       {landlord.email && (
                         <a
                           href={`mailto:${landlord.email}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-sm hover:bg-orange-700 transition-all shadow-sm"
+                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-xs md:text-sm hover:bg-orange-700 transition-all shadow-sm"
                         >
-                          <Mail size={14} />
-                          Email
+                          <Mail size={12} />
+                          <span>Email</span>
                         </a>
                       )}
                       {landlord.website && (
@@ -316,18 +316,12 @@ export default function LandlordsDirectoryPage() {
                           href={landlord.website}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
+                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
                         >
-                          <Globe size={14} />
-                          Website
+                          <Globe size={12} />
+                          <span>Website</span>
                         </a>
                       )}
-                      <button
-                        className="inline-flex items-center gap-2 px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-sm hover:bg-stone-50 hover:text-orange-600 hover:border-orange-200 transition-all"
-                      >
-                        <MessageSquare size={14} />
-                        Message
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -358,15 +352,15 @@ export default function LandlordsDirectoryPage() {
       </main>
 
       {/* Add Listing CTA - Bottom */}
-      <div className="container mx-auto px-4 pb-20">
+      <div className="container mx-auto px-4 pb-16 md:pb-20">
         <Link
           to="/directory/landlords/add"
-          className="block max-w-4xl mx-auto w-full py-4 px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
+          className="block max-w-4xl mx-auto w-full py-3 md:py-4 px-4 md:px-6 bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-dashed border-orange-300 rounded-xl text-center hover:border-orange-400 hover:from-orange-100 hover:to-amber-100 transition-all group"
         >
-          <span className="text-orange-600 font-semibold text-lg group-hover:text-orange-700">
+          <span className="text-orange-600 font-semibold text-base md:text-lg group-hover:text-orange-700">
             Add Your Landlord Listing Here
           </span>
-          <span className="block text-stone-500 text-sm mt-1">
+          <span className="block text-stone-500 text-xs md:text-sm mt-1">
             List Here for 12 Months for only $100
           </span>
         </Link>

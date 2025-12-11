@@ -17,6 +17,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 import {
   Building2,
@@ -29,6 +34,9 @@ import {
   ShoppingCart,
   DollarSign,
   Medal,
+  ChevronRight,
+  ChevronDown,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 
@@ -81,12 +89,16 @@ const HamburgerIcon = ({
 export interface Navbar02NavItem {
   href?: string;
   label: string;
+  description?: string;
   icon?: LucideIcon;
   submenu?: boolean;
+  featured?: boolean;
   items?: Array<{
     href: string;
     label: string;
+    description?: string;
     icon?: LucideIcon;
+    featured?: boolean;
   }>;
 }
 
@@ -102,17 +114,17 @@ export interface Navbar02Props extends React.HTMLAttributes<HTMLElement> {
   onCtaClick?: () => void;
 }
 
-// Default navigation links
+// Default navigation links (Team Syracuse removed - will be separate)
 const defaultNavigationLinks: Navbar02NavItem[] = [
   {
     label: "RENTALS",
     icon: Home,
     submenu: true,
     items: [
-      { href: "/rentals", label: "Rentals", icon: Home },
-      { href: "/short-term", label: "Short-Term", icon: Building2 },
-      { href: "/sublets", label: "Sublets", icon: ArrowRightLeft },
-      { href: "/rooms", label: "Rooms for Rent", icon: Users },
+      { href: "/rentals", label: "All Rentals", description: "Browse all available rental properties", icon: Home },
+      { href: "/short-term", label: "Short-Term", description: "Temporary housing and furnished rentals", icon: Building2 },
+      { href: "/sublets", label: "Sublets", description: "Take over an existing lease", icon: ArrowRightLeft },
+      { href: "/rooms", label: "Rooms for Rent", description: "Find a room in a shared space", icon: Users },
     ],
   },
   {
@@ -120,12 +132,11 @@ const defaultNavigationLinks: Navbar02NavItem[] = [
     icon: Building,
     submenu: true,
     items: [
-      { href: "/directory/apartment-complexes", label: "Apartment Complexes", icon: Building },
-      { href: "/directory/landlords", label: "Landlords", icon: Contact },
-      { href: "/directory/property-managers", label: "Property Managers", icon: Building2 },
-      { href: "/directory/local-businesses", label: "Local Businesses", icon: Store },
-      { href: "/directory/nonprofits", label: "Syracuse NonProfits/Charity", icon: Users },
-      { href: "/directory/team-syracuse", label: "Team Syracuse", icon: Medal },
+      { href: "/directory/apartment-complexes", label: "Apartment Complexes", description: "Multi-unit residential buildings", icon: Building },
+      { href: "/directory/landlords", label: "Landlords", description: "Individual property owners", icon: Contact },
+      { href: "/directory/property-managers", label: "Property Managers", description: "Professional management companies", icon: Building2 },
+      { href: "/directory/local-businesses", label: "Local Businesses", description: "Services and shops nearby", icon: Store },
+      { href: "/directory/nonprofits", label: "NonProfits & Charity", description: "Community organizations", icon: Users },
     ],
   },
   {
@@ -139,6 +150,19 @@ const defaultNavigationLinks: Navbar02NavItem[] = [
     icon: DollarSign,
   },
 ];
+
+// Team Syracuse data
+const teamSyracuseData = {
+  href: "/directory/team-syracuse",
+  label: "Team Syracuse",
+  description: "A community initiative connecting Syracuse University students, faculty, and staff with trusted local housing providers. Our verified network ensures safe, quality housing options near campus.",
+  image: "/team-syracuse-hero.webp",
+  stats: [
+    { label: "Verified Providers", value: "50+" },
+    { label: "Active Listings", value: "200+" },
+    { label: "Happy Tenants", value: "1,000+" },
+  ],
+};
 
 export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
   (
@@ -158,7 +182,20 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
     ref
   ) => {
     const [isMobile, setIsMobile] = useState(false);
+    const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({});
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
+
+    const toggleMenu = (label: string) => {
+      setExpandedMenus(prev => ({
+        ...prev,
+        [label]: !prev[label]
+      }));
+    };
+
+    const closeMobileMenu = () => {
+      setMobileMenuOpen(false);
+    };
 
     useEffect(() => {
       const checkWidth = () => {
@@ -204,7 +241,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
           <div className='flex items-center gap-2'>
             {/* Mobile menu trigger */}
             {isMobile && (
-              <Popover>
+              <Popover open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     className='group h-9 w-9 hover:bg-orange-50 hover:text-orange-600'
@@ -214,56 +251,100 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                     <HamburgerIcon className="text-stone-600" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent align='start' className='w-64 p-1'>
-                  <NavigationMenu className='max-w-none'>
-                    <NavigationMenuList className='flex-col items-start gap-0'>
-                      {navigationLinks.map((link, index) => (
-                        <NavigationMenuItem key={index} className='w-full '>
-                          {link.submenu ? (
-                            <>
-                              <div className='text-stone-500 px-2 py-1.5 text-xs font-medium uppercase tracking-wider'>
-                                {link.label}
-                              </div>
-                              <ul>
-                                    {link.items?.map((item, itemIndex) => {
-                                      const ItemIcon = item.icon;
-                                      return (
-                                      <li key={itemIndex}>
-                                        <Link
-                                          to={item.href || "#"}
-                                          className='flex flex-row w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 cursor-pointer no-underline'
-                                        >
-                                          {ItemIcon && <ItemIcon className="h-4 w-4 flex-shrink-0" />}
-                                          {item.label}
-                                        </Link>
-                                      </li>
-                                    )})}
-                                  </ul>
-                            </>
-                          ) : (
-                            <Link
-                              to={link.href || "#"}
-                              className='flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-stone-600 transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 cursor-pointer no-underline'
+                <PopoverContent align='start' className='w-72 p-2 max-h-[80vh] overflow-y-auto'>
+                  <nav className='flex flex-col gap-1'>
+                    {navigationLinks.map((link, index) => (
+                      <div key={index} className='w-full'>
+                        {link.submenu ? (
+                          <>
+                            {/* Collapsible dropdown header */}
+                            <button
+                              onClick={() => toggleMenu(link.label)}
+                              className='w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold text-stone-700 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition-all cursor-pointer'
                             >
-                              {link.label}
-                            </Link>
-                          )}
-                          {/* Add separator between different types of items */}
-                          {index < navigationLinks.length - 1 &&
-                            ((!link.submenu &&
-                              navigationLinks[index + 1].submenu) ||
-                              (link.submenu &&
-                                !navigationLinks[index + 1].submenu)) && (
-                                <div
-                                  role='separator'
-                                  aria-orientation='horizontal'
-                                  className='bg-stone-200 -mx-1 my-1 h-px w-full'
-                                />
-                              )}
-                        </NavigationMenuItem>
-                      ))}
-                    </NavigationMenuList>
-                  </NavigationMenu>
+                              <div className="flex items-center gap-2">
+                                {link.icon && (
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                    <link.icon className="h-4 w-4" />
+                                  </div>
+                                )}
+                                <span>{link.label}</span>
+                              </div>
+                              <ChevronDown 
+                                className={cn(
+                                  "h-4 w-4 text-stone-400 transition-transform duration-200",
+                                  expandedMenus[link.label] && "rotate-180"
+                                )} 
+                              />
+                            </button>
+                            {/* Collapsible content */}
+                            <div className={cn(
+                              "overflow-hidden transition-all duration-200 ease-in-out",
+                              expandedMenus[link.label] ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                            )}>
+                              <ul className='space-y-0.5 pl-2 pt-1 pb-2'>
+                                {link.items?.map((item, itemIndex) => {
+                                  const ItemIcon = item.icon;
+                                  return (
+                                    <li key={itemIndex}>
+                                      <Link
+                                        to={item.href || "#"}
+                                        onClick={closeMobileMenu}
+                                        className='flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-stone-700 transition-all hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent hover:text-orange-600 cursor-pointer no-underline group'
+                                      >
+                                        {ItemIcon && (
+                                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-stone-100 text-stone-500 group-hover:bg-orange-100 group-hover:text-orange-600 transition-colors">
+                                            <ItemIcon className="h-4 w-4" />
+                                          </div>
+                                        )}
+                                        <div className="flex flex-col">
+                                          <span>{item.label}</span>
+                                          {item.description && (
+                                            <span className="text-[10px] text-stone-400 font-normal normal-case">{item.description}</span>
+                                          )}
+                                        </div>
+                                      </Link>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          </>
+                        ) : (
+                          <Link
+                            to={link.href || "#"}
+                            onClick={closeMobileMenu}
+                            className='flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-stone-700 transition-all hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent hover:text-orange-600 cursor-pointer no-underline'
+                          >
+                            {link.icon && (
+                              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100 text-stone-500">
+                                <link.icon className="h-4 w-4" />
+                              </div>
+                            )}
+                            {link.label}
+                          </Link>
+                        )}
+                        {index < navigationLinks.length - 1 && (
+                          <div className='my-1 h-px bg-gradient-to-r from-stone-200 to-transparent' />
+                        )}
+                      </div>
+                    ))}
+                    {/* Team Syracuse in mobile */}
+                    <div className='my-2 h-px bg-gradient-to-r from-orange-200 to-transparent' />
+                    <Link
+                      to={teamSyracuseData.href}
+                      onClick={closeMobileMenu}
+                      className='flex items-center gap-3 rounded-lg px-3 py-3 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 text-sm font-semibold text-orange-700 transition-all hover:from-orange-100 hover:to-amber-100 cursor-pointer no-underline'
+                    >
+                      <div className="flex flex-col">
+                        <span className="flex items-center gap-1">
+                          Team Syracuse
+                          <Sparkles className="h-3 w-3 text-amber-500" />
+                        </span>
+                        <span className="text-[10px] text-orange-500 font-normal normal-case">Verified housing network</span>
+                      </div>
+                    </Link>
+                  </nav>
                 </PopoverContent>
               </Popover>
             )}
@@ -278,7 +359,7 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
 
           {/* Center: Desktop Nav */}
           {!isMobile && (
-            <div className='flex-1 flex justify-center uppercase'>
+            <div className='flex-1 flex justify-center items-center gap-1 uppercase'>
               <NavigationMenu className='hidden md:flex'>
                 <NavigationMenuList className='gap-1'>
                   {navigationLinks.map((link, index) => (
@@ -289,15 +370,19 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                             {link.label}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent>
-                            <div className='grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'>
-                              {link.items?.map((item, itemIndex) => (
-                                <ListItem
-                                  key={itemIndex}
-                                  title={item.label}
-                                  href={item.href}
-                                  icon={item.icon}
-                                />
-                              ))}
+                            <div className='w-[520px] p-4'>
+                              {/* Grid of items */}
+                              <div className='grid grid-cols-2 gap-2'>
+                                {link.items?.map((item, itemIndex) => (
+                                  <EnhancedListItem
+                                    key={itemIndex}
+                                    title={item.label}
+                                    description={item.description}
+                                    href={item.href}
+                                    icon={item.icon}
+                                  />
+                                ))}
+                              </div>
                             </div>
                           </NavigationMenuContent>
                         </>
@@ -318,9 +403,67 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
                   ))}
                 </NavigationMenuList>
                 <div className='absolute top-full left-0 flex w-full justify-center'>
-                    <NavigationMenuViewport className='origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-stone-200 bg-white text-popover-foreground shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]' />
+                  <NavigationMenuViewport className='origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-xl border border-stone-200 bg-white text-popover-foreground shadow-xl shadow-stone-200/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]' />
                 </div>
               </NavigationMenu>
+
+              {/* Team Syracuse Button with Hover Card */}
+              <HoverCard openDelay={100} closeDelay={200}>
+                <HoverCardTrigger asChild>
+                  <Link
+                    to={teamSyracuseData.href}
+                    className="hidden md:flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium text-stone-600 hover:text-orange-600 hover:bg-orange-50 transition-all cursor-pointer no-underline"
+                  >
+                    <span>TEAM SYRACUSE</span>
+                    <Sparkles className="h-3 w-3 opacity-80" />
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent 
+                  side="bottom" 
+                  align="center" 
+                  sideOffset={12}
+                  className="w-[400px] p-0 overflow-hidden border-0 shadow-2xl shadow-stone-300/50"
+                >
+                  <div className="relative">
+                    {/* Hero Image */}
+                    <div className="relative h-32 overflow-hidden">
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-orange-600 to-amber-500" />
+                      <div className="absolute inset-0 bg-[url('/team-syracuse-hero.webp')] bg-cover bg-center opacity-30" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
+                            <Medal className="h-5 w-5 text-white" />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                              Team Syracuse
+                              <Sparkles className="h-4 w-4 text-amber-300" />
+                            </h3>
+                            <p className="text-xs text-white/80">Verified Housing Network</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Content */}
+                    <div className="p-4 bg-white">
+                      <p className="text-sm text-stone-600 leading-relaxed mb-4 normal-case">
+                        {teamSyracuseData.description}
+                      </p>
+                      
+                      {/* CTA */}
+                      <Link
+                        to={teamSyracuseData.href}
+                        className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-all no-underline"
+                      >
+                        Explore Team Syracuse
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
             </div>
           )}
 
@@ -338,9 +481,12 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
             
             <Button
               asChild
-              className='bg-[#118B50] hover:bg-[#118B50]/90 text-white font-medium shadow-none hover:shadow-sm px-5 h-9 rounded-md transition-all'
+              className={cn(
+                'bg-[#118B50] hover:bg-[#118B50]/90 text-white font-medium shadow-none hover:shadow-sm rounded-md transition-all',
+                isMobile ? 'px-2 h-8 text-xs' : 'px-5 h-9 text-sm'
+              )}
             >
-              <Link to={ctaHref}>{ctaText}</Link>
+              <Link to={ctaHref}>{isMobile ? 'Manage Listings' : ctaText}</Link>
             </Button>
           </div>
         </div>
@@ -350,7 +496,45 @@ export const Navbar = React.forwardRef<HTMLElement, Navbar02Props>(
 );
 Navbar.displayName = "Navbar";
 
-// ListItem component for navigation menu items
+// Enhanced ListItem component for dropdown menus
+const EnhancedListItem = React.forwardRef<
+  React.ElementRef<"a">,
+  React.ComponentPropsWithoutRef<"a"> & {
+    title: string;
+    description?: string;
+    href?: string;
+    icon?: LucideIcon;
+  }
+>(({ className, title, description, href, icon: Icon, ...props }, ref) => {
+  return (
+    <NavigationMenuLink asChild>
+      <Link
+        to={href || "#"}
+        className={cn(
+          "group flex flex-col select-none rounded-xl p-3 leading-none no-underline outline-none transition-all hover:bg-gradient-to-br hover:from-orange-50 hover:to-amber-50/50 hover:shadow-sm cursor-pointer border border-transparent hover:border-orange-100",
+          className
+        )}
+      >
+        {/* Row 1: Icon + Title */}
+        <div className="flex items-center gap-2 mb-1">
+          {Icon && (
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-stone-100 text-stone-500 group-hover:bg-orange-100 group-hover:text-orange-600 transition-all">
+              <Icon className="h-3.5 w-3.5" />
+            </div>
+          )}
+          <div className='text-sm font-semibold text-stone-800 group-hover:text-orange-700 transition-colors'>{title}</div>
+        </div>
+        {/* Row 2: Description */}
+        {description && (
+          <div className="text-xs font-normal text-stone-500 normal-case leading-relaxed pl-8">{description}</div>
+        )}
+      </Link>
+    </NavigationMenuLink>
+  );
+});
+EnhancedListItem.displayName = "EnhancedListItem";
+
+// Legacy ListItem for backwards compatibility
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a"> & {

@@ -30,6 +30,7 @@ export default [
     route("landlord/dashboard", "routes/landlord-dashboard.tsx"),
     route("landlord/create-listing", "routes/landlord-new-listing.tsx"),
     route("compare", "routes/compare.tsx"),
+    route("favorites", "routes/favorites.tsx"),
     route("team-syracuse", "routes/team-syracuse.tsx"),
     route("join-team-syracuse", "routes/join-team-syracuse.tsx"),
     route("faqs", "routes/faqs.tsx"),
