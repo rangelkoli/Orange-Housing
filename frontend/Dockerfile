@@ -1,6 +1,11 @@
 # Stage 1: Install dependencies and build using Bun
 FROM oven/bun:1 AS builder
 WORKDIR /app
+
+# Build arguments for Vite (must be available at build time)
+ARG VITE_BACKEND_URL
+ENV VITE_BACKEND_URL=${VITE_BACKEND_URL}
+
 COPY package.json bun.lockb ./
 RUN bun install
 COPY . .
