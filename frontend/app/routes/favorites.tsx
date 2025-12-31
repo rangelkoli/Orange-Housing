@@ -58,7 +58,7 @@ export default function FavoritesPage() {
             <p className="text-stone-500 max-w-md mx-auto mb-8">
               Start exploring listings and click the heart icon to save your favorite properties here for easy access.
             </p>
-            <Link to="/rentals">
+            <Link to="/listings?type=rentals">
               <Button className="bg-orange-600 hover:bg-orange-700 text-white">
                 <Home size={18} className="mr-2" />
                 Browse Listings

@@ -30,10 +30,10 @@ import {
 import SearchWidget from "../components/SearchWidget";
 import { useState, useEffect } from "react";
 import { FaPhone } from "react-icons/fa";
-import { BackgroundGradientAnimation } from "components/ui/shadcn-io/background-gradient-animation";
 import { type MetaFunction } from "react-router";
 import { motion } from "framer-motion";
 import { useFavoritesStore } from "../stores/favoritesStore";
+import { getListingDetailUrl } from "../utils/listingSlug";
 
 // Animation variants
 const fadeInUp = {
@@ -165,7 +165,8 @@ function FeaturedHomeCard({ home }: { home: any }) {
   const isHomeFavorite = isFavorite(home.id);
 
   const handleCardClick = () => {
-    navigate(`/listings/${home.id}`);
+    // Use the pre-computed detailUrl for SEO-friendly type-based URLs
+    navigate(home.detailUrl);
   };
 
   const nextImage = (e: React.MouseEvent) => {
@@ -343,6 +344,9 @@ function FeaturedHomes() {
             baths: listing.baths,
             address: listing.address,
             city: listing.city,
+            location: listing.location,
+            typeCode: listing.typeCode,
+            detailUrl: getListingDetailUrl(listing),
             category: listing.typeCode === 1 ? 'Rental' : 
                       listing.typeCode === 2 ? 'Sublet' :
                       listing.typeCode === 3 ? 'Room for Rent' : 
@@ -368,11 +372,27 @@ function FeaturedHomes() {
   // Loading skeleton
   if (loading) {
     return (
-      <section className='py-32 bg-gradient-to-b from-white via-stone-50/50 to-white relative overflow-hidden'>
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: `repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 0, transparent 50%)`,
-          backgroundSize: '20px 20px'
-        }} />
+      <section className='py-32 relative overflow-hidden'>
+        {/* Background Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-orange-50/30 via-stone-50 to-slate-50/30" />
+        
+        {/* Grid Pattern matching Hero */}
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, #1a1a1a 1px, transparent 1px),
+              linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px'
+          }}
+        />
+        
+        {/* Gradient accent orbs relative to this section */}
+        <div className="absolute top-0 -left-32 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 -right-32 w-96 h-96 bg-amber-300/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+
         <div className='container mx-auto px-4 relative z-10'>
           <div className='text-center mb-16'>
             <h2 className='text-3xl md:text-4xl font-bold text-stone-900 mb-4 font-serif'>
@@ -400,12 +420,27 @@ function FeaturedHomes() {
   }
 
   return (
-    <section className='py-32 bg-gradient-to-b from-white via-stone-50/50 to-white relative overflow-hidden'>
-      {/* Subtle diagonal lines pattern */}
-      <div className="absolute inset-0 opacity-[0.015]" style={{
-        backgroundImage: `repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 0, transparent 50%)`,
-        backgroundSize: '20px 20px'
-      }} />
+    <section className='py-32 relative overflow-hidden'>
+      {/* Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-orange-50/30 via-stone-50 to-slate-50/30" />
+      
+      {/* Grid Pattern matching Hero */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, #1a1a1a 1px, transparent 1px),
+            linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)
+          `,
+          backgroundSize: '60px 60px'
+        }}
+      />
+      
+      {/* Gradient accent orbs */}
+      <div className="absolute top-0 -left-32 w-96 h-96 bg-orange-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 -right-32 w-96 h-96 bg-amber-300/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-500/5 rounded-full blur-3xl pointer-events-none" />
+
       <div className='container mx-auto px-4 relative z-10'>
         <motion.div 
           className='text-center mb-16'
@@ -456,40 +491,54 @@ function FeaturedHomes() {
 }
 
 function LocalAds() {
-  const businesses = [
-    {
-      name: "Salt City Movers",
-      image:
-        "https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=1000&auto=format&fit=crop",
-      desc: "Your trusted local movers for a stress-free transition to your new sanctuary.",
-      phone: "315-555-0101",
-      email: "move@saltcity.com",
-    },
-    {
-      name: "The Cave Cafe",
-      image:
-        "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1000&auto=format&fit=crop",
-      desc: "The perfect spot for great coffee and feel the community vibe. Just around the corner!",
-      phone: "315-555-0102",
-      email: "hello@cavecafe.com",
-    },
-    {
-      name: "CNY Cleaners",
-      image:
-        "https://images.unsplash.com/photo-1581578731117-104f8a746a32?q=80&w=1000&auto=format&fit=crop",
-      desc: "Professional home cleaning services to keep your sanctuary sparkling.",
-      phone: "315-555-0103",
-      email: "clean@cny.com",
-    },
-    {
-      name: "Upstate Home Goods",
-      image:
-        "https://images.unsplash.com/photo-1616046229478-9901c5536a45?q=80&w=1000&auto=format&fit=crop",
-      desc: "Find unique furniture and decor to personalize your new Syracuse home.",
-      phone: "315-555-0104",
-      email: "shop@upstate.com",
-    },
-  ];
+  const [ads, setAds] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/ads/`);
+        const data = await response.json();
+        if (data.ads) {
+          setAds(data.ads);
+        }
+      } catch (error) {
+        console.error("Error fetching ads:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAds();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className='py-32 bg-gradient-to-br from-stone-50 via-white to-orange-50/20 relative overflow-hidden'>
+        <div className='container mx-auto px-4 relative z-10'>
+          <div className='text-center mb-16'>
+            <h2 className='text-3xl md:text-4xl font-bold text-stone-900 font-serif mb-4'>
+              Support our Local Syracuse Businesses
+            </h2>
+            <div className="h-4 bg-stone-200 rounded w-1/3 mx-auto animate-pulse" />
+          </div>
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 max-w-7xl mx-auto'>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className='bg-white rounded-lg overflow-hidden shadow-sm border border-stone-100 h-96 animate-pulse'>
+                <div className='h-64 bg-stone-200' />
+                <div className='p-6 space-y-4'>
+                  <div className='h-6 bg-stone-200 rounded w-3/4' />
+                  <div className='h-4 bg-stone-200 rounded w-full' />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (ads.length === 0) return null;
 
   return (
     <section className='py-32 bg-gradient-to-br from-stone-50 via-white to-orange-50/20 relative overflow-hidden'>
@@ -532,49 +581,64 @@ function LocalAds() {
             }
           }}
         >
-          {businesses.map((biz, idx) => (
+          {ads.map((ad, idx) => (
             <motion.div
-              key={idx}
+              key={ad.id || idx}
               variants={{
                 initial: { opacity: 0, y: 30 },
                 animate: { opacity: 1, y: 0 }
               }}
               transition={{ duration: 0.5 }}
-              className='bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-stone-100'
+              className='bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-stone-100 flex flex-col h-full'
             >
-              <div className='relative h-64 overflow-hidden'>
-                <img
-                  src={biz.image}
-                  alt={biz.name}
-                  className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
-                />
-
+              <div className='relative h-64 overflow-hidden bg-stone-100'>
+                {ad.logo ? (
+                  <img
+                    src={ad.logo.startsWith('http') ? ad.logo : `${import.meta.env.VITE_BACKEND_URL}/media/${ad.logo}`}
+                    alt={ad.name}
+                    className='w-full h-full object-cover transition-transform duration-500 group-hover:scale-105'
+                    onError={(e) => {
+                      // Fallback if image fails to load
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-stone-400">
+                    <Store size={48} />
+                  </div>
+                )}
               </div>
-              <div className='p-6 flex flex-col gap-4 h-full'>
-                <div>
+              <div className='p-6 flex flex-col gap-4 flex-grow'>
+                <div className="flex-grow">
                   <h3 className='text-xl font-bold text-stone-900 mb-2 font-serif'>
-                    {biz.name}
+                    {ad.name}
                   </h3>
-                  <p className='text-stone-500 text-sm leading-relaxed'>
-                    {biz.desc}
+                  <p className='text-stone-500 text-sm leading-relaxed line-clamp-3'>
+                    {ad.description}
                   </p>
                 </div>
 
-                <div className=' flex gap-3'>
-                  <a 
-                    href={`tel:${biz.phone}`}
-                    className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn font-mono uppercase text-xs'
-                  >
-                    <FaPhone size={14} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
-                    Call
-                  </a>
-                  <a 
-                    href={`mailto:${biz.email}`}
-                    className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 font-mono uppercase text-xs'
-                  >
-                    <Mail size={16} />
-                    Email
-                  </a>
+                <div className='flex gap-3 mt-auto'>
+                  {ad.phone && (
+                    <a 
+                      href={`tel:${ad.phone}`}
+                      className='flex-1 py-2.5 border border-stone-200 rounded-lg text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all duration-200 flex items-center justify-center gap-2 group/btn font-mono uppercase text-xs'
+                    >
+                      <FaPhone size={14} className="text-stone-400 group-hover/btn:text-stone-600 transition-colors" />
+                      Call
+                    </a>
+                  )}
+                  {ad.url && (
+                    <a 
+                      href={ad.url.startsWith('http') ? ad.url : `https://${ad.url}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className='flex-1 py-2.5 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 transition-all duration-200 shadow-sm hover:shadow-md flex items-center justify-center gap-2 font-mono uppercase text-xs'
+                    >
+                      <Globe size={16} />
+                      Visit
+                    </a>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -1004,13 +1068,9 @@ function Blog() {
   ];
 
   return (
-    <section className='py-32 bg-gradient-to-b from-stone-50 to-white relative overflow-hidden'>
-      {/* Subtle texture */}
-      <div className="absolute inset-0 opacity-[0.015]" style={{
-        backgroundImage: `linear-gradient(45deg, #000 25%, transparent 25%), linear-gradient(-45deg, #000 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #000 75%), linear-gradient(-45deg, transparent 75%, #000 75%)`,
-        backgroundSize: '20px 20px',
-        backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
-      }} />
+    <section className='py-32 bg-gradient-to-br from-stone-50 via-orange-50/30 to-white relative overflow-hidden'>
+      {/* Subtle grid pattern */}
+     
       <div className='container mx-auto px-4 relative z-10'>
         <motion.div 
           className='flex flex-col md:flex-row justify-between items-end mb-12 gap-4'

@@ -12,6 +12,8 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
+import { Toaster } from "./components/ui/sonner";
+
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -30,8 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   // Hide public navbar on landlord dashboard and admin pages
   const shouldHidePublicNav = 
-    location.pathname.startsWith('/landlord/dashboard') || 
-    location.pathname.startsWith('/landlord/create-listing') ||
+    location.pathname.startsWith('/landlord/') || 
     location.pathname.startsWith('/admin');
 
   return (
@@ -47,8 +48,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         {!shouldHidePublicNav && <Footer />}
         <ScrollRestoration />
+        <Toaster />
         <Scripts />
       </body>
+
     </html>
   );
 }

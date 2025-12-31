@@ -10,7 +10,7 @@ export default function RoomDetailPage() {
     <ListingDetailPage
       listingId={listingId}
       listingType="rooms"
-      backLink="/rooms"
+      backLink="/listings?type=rooms"
       backLinkText="Rooms for Rent"
     />
   );

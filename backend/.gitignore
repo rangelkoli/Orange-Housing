@@ -10,3 +10,7 @@ venv
 # Backup files # 
 *.bak 
 structure.sql
+uploads
+/uploads/*
+.env
+.env.example

@@ -41,6 +41,8 @@ class User(models.Model):
     last_name = models.CharField(max_length=255)
     contact_number = models.CharField(max_length=255)
     last_ip = models.CharField(max_length=45, null=True, blank=True)
+    stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
+
 
 
     class Meta:

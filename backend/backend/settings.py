@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +48,11 @@ INSTALLED_APPS = [
     "directory",
     "alerts",
     "ads",
+    "payments",
+    "rest_framework",
 ]
+
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -127,9 +133,52 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+# Media files (User uploaded content)
+# Check if R2 storage is configured via environment variables
+R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID')
+R2_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY')
+R2_BUCKET_NAME = os.getenv('R2_BUCKET_NAME')
+R2_ACCOUNT_ID = os.getenv('R2_ACCOUNT_ID')
+
+if R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY and R2_BUCKET_NAME and R2_ACCOUNT_ID:
+    # Use Cloudflare R2 storage
+    R2_ENDPOINT_URL = f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+    
+    # R2_PUBLIC_URL is the public-facing URL for serving files
+    # This is different from the API endpoint - get it from Cloudflare R2 dashboard
+    R2_PUBLIC_URL = os.getenv('R2_PUBLIC_URL')  # e.g., https://pub-xxx.r2.dev
+    R2_CUSTOM_DOMAIN = os.getenv('R2_CUSTOM_DOMAIN')  # Optional: custom domain
+    
+    STORAGES = {
+        "default": {
+            "BACKEND": "backend.storages.R2MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    
+    # Set MEDIA_URL to R2 public URL (priority: custom domain > public URL > fallback)
+    if R2_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{R2_CUSTOM_DOMAIN}/"
+    elif R2_PUBLIC_URL:
+        # Use the public URL from environment (ensure trailing slash)
+        MEDIA_URL = R2_PUBLIC_URL if R2_PUBLIC_URL.endswith('/') else f"{R2_PUBLIC_URL}/"
+    else:
+        # Fallback - this is the internal endpoint (may not work for public access!)
+        MEDIA_URL = f"https://{R2_BUCKET_NAME}.{R2_ACCOUNT_ID}.r2.cloudflarestorage.com/"
+else:
+    # Fall back to local storage for development
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "uploads"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+
+

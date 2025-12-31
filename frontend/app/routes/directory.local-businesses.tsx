@@ -1,58 +1,39 @@
 import { DirectoryPage, type DirectoryItem } from "../components/DirectoryPage";
 
+import { useState, useEffect } from "react";
+
 export default function LocalBusinessesDirectoryPage() {
-  const items: DirectoryItem[] = [
-    {
-      id: 1,
-      name: "Syracuse Moving Company",
-      description: "Professional moving services for apartments and homes. Local and long-distance moves with careful handling of your belongings.",
-      address: "150 Solar St, Syracuse, NY 13204",
-      phone: "(315) 555-5001",
-      website: "https://example.com",
-      image: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=1000&auto=format&fit=crop",
-      category: "Moving Services"
-    },
-    {
-      id: 2,
-      name: "CNY Home Inspections",
-      description: "Certified home inspectors providing thorough inspections for renters and buyers. Know before you sign!",
-      address: "300 Erie Blvd, Syracuse, NY 13202",
-      phone: "(315) 555-5002",
-      website: "https://example.com",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1000&auto=format&fit=crop",
-      category: "Home Services"
-    },
-    {
-      id: 3,
-      name: "Syracuse Furniture Outlet",
-      description: "Affordable new and gently used furniture perfect for apartments and student housing. Delivery available!",
-      address: "2401 S Salina St, Syracuse, NY 13205",
-      phone: "(315) 555-5003",
-      website: "https://example.com",
-      image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1000&auto=format&fit=crop",
-      category: "Furniture"
-    },
-    {
-      id: 4,
-      name: "University Cleaners",
-      description: "Professional cleaning services for move-in and move-out. Deep cleaning, carpet cleaning, and regular maintenance.",
-      address: "720 S Crouse Ave, Syracuse, NY 13210",
-      phone: "(315) 555-5004",
-      website: "https://example.com",
-      image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=1000&auto=format&fit=crop",
-      category: "Cleaning Services"
-    },
-    {
-      id: 5,
-      name: "Salt City Storage",
-      description: "Secure storage units in various sizes. Climate controlled options available. Perfect for between semesters!",
-      address: "500 N State St, Syracuse, NY 13203",
-      phone: "(315) 555-5005",
-      website: "https://example.com",
-      image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?q=80&w=1000&auto=format&fit=crop",
-      category: "Storage"
-    },
-  ];
+  const [items, setItems] = useState<DirectoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBusinesses = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/directory/businesses/");
+        const result = await response.json();
+        if (result.success) {
+          const mappedData = result.data.map((item: any) => ({
+            id: item.id,
+            name: item.name || "Unnamed Business",
+            description: item.contact_name ? `Contact: ${item.contact_name}` : "Local business helping with housing in Syracuse.",
+            address: "Syracuse, NY",
+            phone: item.phone,
+            email: item.email,
+            website: item.url,
+            image: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=1000&auto=format&fit=crop",
+            category: item.category || "Business"
+          }));
+          setItems(mappedData);
+        }
+      } catch (error) {
+        console.error("Error fetching businesses:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBusinesses();
+  }, []);
 
   return (
     <DirectoryPage 
@@ -62,6 +43,7 @@ export default function LocalBusinessesDirectoryPage() {
       addListingLink="/directory/local-businesses/add"
       addListingText="Add Your Business Here"
       isPaidListing={true}
+      isLoading={isLoading}
     />
   );
 }

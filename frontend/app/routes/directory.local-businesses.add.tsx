@@ -4,84 +4,45 @@ import {
   ArrowLeft,
   ChevronRight,
   Building2,
-  Upload,
   Check,
   CreditCard,
   Clock,
   Shield,
-  Star,
   Phone,
   Mail,
   Globe,
   MapPin,
   ImageIcon,
+  Calendar,
+  Info,
+  Minus,
+  Plus,
 } from "lucide-react";
-
-type PricingPlan = "6month" | "12month";
 
 interface FormData {
   businessName: string;
-  contactName: string;
-  email: string;
   phone: string;
   website: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  category: string;
   description: string;
   image: File | null;
 }
 
 export default function AddBusinessPage() {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [selectedPlan, setSelectedPlan] = useState<PricingPlan>("12month");
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [durationMonths, setDurationMonths] = useState<number>(12);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<FormData>({
     businessName: "",
-    contactName: "",
-    email: "",
     phone: "",
     website: "",
-    address: "",
-    city: "",
-    state: "NY",
-    zipCode: "",
-    category: "",
     description: "",
     image: null,
   });
 
-  const categories = [
-    "Moving Services",
-    "Cleaning Services",
-    "Home Services",
-    "Furniture",
-    "Storage",
-    "Home Improvement",
-    "Landscaping",
-    "Pest Control",
-    "Appliance Repair",
-    "Other",
-  ];
-
-  const plans = {
-    "6month": {
-      price: 200,
-      duration: "6 Months",
-      perMonth: "$33.33/mo",
-      savings: null,
-    },
-    "12month": {
-      price: 300,
-      duration: "12 Months",
-      perMonth: "$25/mo",
-      savings: "Save $100",
-    },
-  };
+  const COST_PER_MONTH = 10;
+  const totalCost = durationMonths * COST_PER_MONTH;
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -102,6 +63,10 @@ export default function AddBusinessPage() {
     }
   };
 
+  const handleDurationChange = (amount: number) => {
+    setDurationMonths((prev) => Math.max(1, Math.min(60, prev + amount)));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -118,7 +83,7 @@ export default function AddBusinessPage() {
       
       // Simulate Stripe checkout redirect
       // In production: window.location.href = stripeCheckoutUrl;
-      setStep(3);
+      setIsSubmitted(true);
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("There was an error processing your request. Please try again.");
@@ -127,16 +92,10 @@ export default function AddBusinessPage() {
     }
   };
 
-  const isStep1Valid = () => {
+  const isFormValid = () => {
     return (
       formData.businessName.trim() !== "" &&
-      formData.contactName.trim() !== "" &&
-      formData.email.trim() !== "" &&
       formData.phone.trim() !== "" &&
-      formData.address.trim() !== "" &&
-      formData.city.trim() !== "" &&
-      formData.zipCode.trim() !== "" &&
-      formData.category !== "" &&
       formData.description.trim() !== ""
     );
   };
@@ -183,560 +142,12 @@ export default function AddBusinessPage() {
             Add Your Business to Our Directory
           </h1>
           <p className="text-stone-600 text-lg max-w-2xl mx-auto">
-            To be listed under <strong>Support our Local Syracuse Businesses</strong>, please fill out this form with your contact info and upload 1 picture.
+            To be listed under <strong>Support our Local Syracuse Businesses</strong>, please fill out this form below.
           </p>
         </div>
 
-        {/* Progress Steps */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="flex items-center justify-center">
-            {[1, 2, 3].map((stepNum) => (
-              <div key={stepNum} className="flex items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
-                    step >= stepNum
-                      ? "bg-orange-600 text-white"
-                      : "bg-stone-200 text-stone-500"
-                  }`}
-                >
-                  {step > stepNum ? <Check size={20} /> : stepNum}
-                </div>
-                {stepNum < 3 && (
-                  <div
-                    className={`w-24 h-1 mx-2 rounded-full transition-all ${
-                      step > stepNum ? "bg-orange-600" : "bg-stone-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-sm text-stone-500 px-4">
-            <span className={step >= 1 ? "text-orange-600 font-medium" : ""}>
-              Business Info
-            </span>
-            <span className={step >= 2 ? "text-orange-600 font-medium" : ""}>
-              Choose Plan
-            </span>
-            <span className={step >= 3 ? "text-orange-600 font-medium" : ""}>
-              Confirmation
-            </span>
-          </div>
-        </div>
-
-        {/* Step 1: Business Information */}
-        {step === 1 && (
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
-              <h2 className="text-2xl font-bold text-stone-900 mb-6 font-serif">
-                Business Information
-              </h2>
-
-              <form className="space-y-6">
-                {/* Business Name */}
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Business Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="businessName"
-                    value={formData.businessName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                    placeholder="Enter your business name"
-                    required
-                  />
-                </div>
-
-                {/* Contact Name & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      Contact Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="contactName"
-                      value={formData.contactName}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="Your name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="email@example.com"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Phone & Website */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      Phone Number <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="(315) 555-0123"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      Website (optional)
-                    </label>
-                    <input
-                      type="url"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="https://www.yourbusiness.com"
-                    />
-                  </div>
-                </div>
-
-                {/* Address */}
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Street Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="address"
-                    value={formData.address}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                    placeholder="123 Main Street"
-                    required
-                  />
-                </div>
-
-                {/* City, State, Zip */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      City <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="Syracuse"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      State
-                    </label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg bg-stone-50 text-stone-600"
-                      disabled
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-2">
-                      ZIP Code <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="zipCode"
-                      value={formData.zipCode}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      placeholder="13202"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Business Category <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all bg-white"
-                    required
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Business Description <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
-                    placeholder="Tell us about your business, services offered, and what makes you unique..."
-                    required
-                  />
-                  <p className="text-xs text-stone-500 mt-1">
-                    Maximum 500 characters
-                  </p>
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-stone-700 mb-2">
-                    Business Photo (optional)
-                  </label>
-                  <div className="border-2 border-dashed border-stone-200 rounded-lg p-6 text-center hover:border-orange-300 transition-colors">
-                    {imagePreview ? (
-                      <div className="relative">
-                        <img
-                          src={imagePreview}
-                          alt="Preview"
-                          className="max-h-48 mx-auto rounded-lg"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setImagePreview(null);
-                            setFormData((prev) => ({ ...prev, image: null }));
-                          }}
-                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    ) : (
-                      <label className="cursor-pointer">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center text-stone-400">
-                            <ImageIcon size={24} />
-                          </div>
-                          <span className="text-stone-600 font-medium">
-                            Click to upload an image
-                          </span>
-                          <span className="text-xs text-stone-400">
-                            PNG, JPG up to 5MB
-                          </span>
-                        </div>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageChange}
-                          className="hidden"
-                        />
-                      </label>
-                    )}
-                  </div>
-                </div>
-
-                {/* Continue Button */}
-                <div className="pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setStep(2)}
-                    disabled={!isStep1Valid()}
-                    className="w-full py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors disabled:bg-stone-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    Continue to Pricing
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Choose Plan */}
-        {step === 2 && (
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8">
-              <h2 className="text-2xl font-bold text-stone-900 mb-2 font-serif">
-                Choose Your Listing Plan
-              </h2>
-              <p className="text-stone-600 mb-8">
-                Select a plan that works best for your business. Both plans include full directory listing with your business information and photo.
-              </p>
-
-              {/* Pricing Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                {/* 6 Month Plan */}
-                <div
-                  onClick={() => setSelectedPlan("6month")}
-                  className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                    selectedPlan === "6month"
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-stone-200 hover:border-stone-300"
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-stone-900">
-                        6 Month Listing
-                      </h3>
-                      <p className="text-stone-500 text-sm">{plans["6month"].perMonth}</p>
-                    </div>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        selectedPlan === "6month"
-                          ? "border-orange-500 bg-orange-500"
-                          : "border-stone-300"
-                      }`}
-                    >
-                      {selectedPlan === "6month" && (
-                        <Check size={14} className="text-white" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-stone-900 mb-4">
-                    ${plans["6month"].price}
-                    <span className="text-base font-normal text-stone-500">
-                      {" "}
-                      one-time
-                    </span>
-                  </div>
-                  <ul className="space-y-2 text-sm text-stone-600">
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Full directory listing
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Business photo included
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Contact info displayed
-                    </li>
-                  </ul>
-                </div>
-
-                {/* 12 Month Plan */}
-                <div
-                  onClick={() => setSelectedPlan("12month")}
-                  className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
-                    selectedPlan === "12month"
-                      ? "border-orange-500 bg-orange-50"
-                      : "border-stone-200 hover:border-stone-300"
-                  }`}
-                >
-                  {/* Best Value Badge */}
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
-                      Best Value
-                    </span>
-                  </div>
-
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-bold text-stone-900">
-                        12 Month Listing
-                      </h3>
-                      <p className="text-stone-500 text-sm">{plans["12month"].perMonth}</p>
-                    </div>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        selectedPlan === "12month"
-                          ? "border-orange-500 bg-orange-500"
-                          : "border-stone-300"
-                      }`}
-                    >
-                      {selectedPlan === "12month" && (
-                        <Check size={14} className="text-white" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-stone-900 mb-1">
-                    ${plans["12month"].price}
-                    <span className="text-base font-normal text-stone-500">
-                      {" "}
-                      one-time
-                    </span>
-                  </div>
-                  <p className="text-green-600 text-sm font-semibold mb-4">
-                    {plans["12month"].savings}
-                  </p>
-                  <ul className="space-y-2 text-sm text-stone-600">
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Full directory listing
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Business photo included
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check size={16} className="text-green-500" />
-                      Contact info displayed
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Star size={16} className="text-orange-500" />
-                      <span className="font-medium">Priority placement</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="bg-stone-50 rounded-xl p-6 mb-8">
-                <h3 className="font-bold text-stone-900 mb-4">
-                  What's Included in Your Listing:
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <MapPin size={18} className="text-orange-600" />
-                    </div>
-                    <span>Business address & map</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Phone size={18} className="text-orange-600" />
-                    </div>
-                    <span>Click-to-call phone</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Mail size={18} className="text-orange-600" />
-                    </div>
-                    <span>Email contact button</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Globe size={18} className="text-orange-600" />
-                    </div>
-                    <span>Website link</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <ImageIcon size={18} className="text-orange-600" />
-                    </div>
-                    <span>Business photo</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Shield size={18} className="text-orange-600" />
-                    </div>
-                    <span>Verified badge</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Order Summary */}
-              <div className="bg-orange-50 rounded-xl p-6 mb-8 border border-orange-100">
-                <h3 className="font-bold text-stone-900 mb-4">Order Summary</h3>
-                <div className="flex justify-between items-center py-2 border-b border-orange-200">
-                  <span className="text-stone-600">
-                    Directory Listing ({plans[selectedPlan].duration})
-                  </span>
-                  <span className="font-semibold">${plans[selectedPlan].price}</span>
-                </div>
-                <div className="flex justify-between items-center py-4">
-                  <span className="font-bold text-lg">Total</span>
-                  <span className="font-bold text-2xl text-orange-600">
-                    ${plans[selectedPlan].price}
-                  </span>
-                </div>
-              </div>
-
-              {/* Payment Note */}
-              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg mb-8 border border-blue-100">
-                <CreditCard size={20} className="text-blue-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-800">
-                  <p className="font-semibold mb-1">Secure Payment via Stripe</p>
-                  <p>
-                    You'll be redirected to Stripe's secure checkout to complete your
-                    payment. We accept all major credit cards. Your listing will go
-                    live automatically after payment is confirmed.
-                  </p>
-                </div>
-              </div>
-
-              {/* Pay by Check Option */}
-              <div className="flex items-start gap-3 p-4 bg-stone-100 rounded-lg mb-8">
-                <Clock size={20} className="text-stone-600 shrink-0 mt-0.5" />
-                <div className="text-sm text-stone-600">
-                  <p className="font-semibold mb-1">Prefer to Pay by Check?</p>
-                  <p>
-                    You can also mail a check to our office. Your listing will be
-                    added to a holding queue and will go live once payment is
-                    received. Contact us at{" "}
-                    <a
-                      href="mailto:Donna@orangehousing.com"
-                      className="text-orange-600 hover:underline"
-                    >
-                      Donna@orangehousing.com
-                    </a>{" "}
-                    for mailing instructions.
-                  </p>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="flex-1 py-4 border border-stone-200 text-stone-700 font-semibold rounded-lg hover:bg-stone-50 transition-colors"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={isSubmitting}
-                  className="flex-1 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors disabled:bg-orange-400 flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard size={20} />
-                      Proceed to Payment - ${plans[selectedPlan].price}
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Confirmation */}
-        {step === 3 && (
+        {/* Confirmation View */}
+        {isSubmitted ? (
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-8 text-center">
               <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -759,7 +170,7 @@ export default function AddBusinessPage() {
                       <span className="text-orange-600 font-bold text-xs">1</span>
                     </div>
                     <span>
-                      A confirmation receipt will be sent to <strong>{formData.email}</strong>
+                      A confirmation receipt will be sent to your provided contact email
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
@@ -795,6 +206,292 @@ export default function AddBusinessPage() {
                   Return Home
                 </Link>
               </div>
+            </div>
+          </div>
+        ) : (
+          /* Main Form Layout */
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                
+                {/* Left Column: Form & Duration */}
+                <div className="lg:col-span-2 space-y-8">
+                    
+                    {/* Business Information Card */}
+                    <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+                        <div className="bg-stone-50 px-8 py-6 border-b border-stone-100">
+                            <h2 className="text-xl font-bold text-stone-900 font-serif">
+                                Business Information
+                            </h2>
+                            <p className="text-stone-500 text-sm mt-1">
+                                Tell us about your business so customers can find you.
+                            </p>
+                        </div>
+                        <div className="p-8">
+                            <form className="space-y-6">
+                                {/* Business Name */}
+                                <div>
+                                <label className="block text-sm font-medium text-stone-700 mb-2">
+                                    Business Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="businessName"
+                                    value={formData.businessName}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all font-medium"
+                                    placeholder="Enter your business name"
+                                    required
+                                />
+                                </div>
+                                {/* Phone & Website */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-700 mb-2">
+                                    Phone Number <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                    type="tel"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                                    placeholder="(315) 555-0123"
+                                    required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-700 mb-2">
+                                    Website (optional)
+                                    </label>
+                                    <input
+                                    type="url"
+                                    name="website"
+                                    value={formData.website}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                                    placeholder="https://www.yourbusiness.com"
+                                    />
+                                </div>
+                                </div>
+
+
+                                {/* Description */}
+                                <div>
+                                <label className="block text-sm font-medium text-stone-700 mb-2">
+                                    Business Description <span className="text-red-500">*</span>
+                                </label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    rows={4}
+                                    className="w-full px-4 py-3 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all resize-none"
+                                    placeholder="Tell us about your business, services offered, and what makes you unique..."
+                                    required
+                                />
+                                <p className="text-xs text-stone-500 mt-1 flex justify-end">
+                                    {formData.description.length} / 500 characters
+                                </p>
+                                </div>
+
+                                {/* Image Upload */}
+                                <div>
+                                <label className="block text-sm font-medium text-stone-700 mb-2">
+                                    Business Photo (optional)
+                                </label>
+                                <div className="border-2 border-dashed border-stone-200 rounded-xl p-8 text-center hover:border-orange-400 hover:bg-orange-50/10 transition-colors cursor-pointer group">
+                                    {imagePreview ? (
+                                    <div className="relative inline-block">
+                                        <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="max-h-64 rounded-lg shadow-md"
+                                        />
+                                        <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            setImagePreview(null);
+                                            setFormData((prev) => ({ ...prev, image: null }));
+                                        }}
+                                        className="absolute -top-3 -right-3 p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors shadow-sm"
+                                        >
+                                        <Minus size={16} />
+                                        </button>
+                                    </div>
+                                    ) : (
+                                    <label className="cursor-pointer block w-full h-full">
+                                        <div className="flex flex-col items-center gap-3">
+                                        <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center text-stone-400 group-hover:scale-110 transition-transform group-hover:text-orange-500 group-hover:bg-orange-100">
+                                            <ImageIcon size={32} />
+                                        </div>
+                                        <div>
+                                            <span className="text-stone-900 font-medium block text-lg">
+                                                Upload Business Photo
+                                            </span>
+                                            <span className="text-stone-500 text-sm">
+                                                Drag and drop or click to browse
+                                            </span>
+                                        </div>
+                                        <span className="text-xs text-stone-400 bg-stone-100 px-3 py-1 rounded-full">
+                                            PNG, JPG up to 5MB
+                                        </span>
+                                        </div>
+                                        <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleImageChange}
+                                        className="hidden"
+                                        />
+                                    </label>
+                                    )}
+                                </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                
+
+                    {/* Features Preview */}
+                    <div className="bg-stone-50 rounded-xl p-6 border border-stone-200 border-dashed">
+                        <h3 className="font-bold text-stone-900 mb-4 text-sm uppercase tracking-wide">
+                            Your Professional Listing Includes:
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-sm">
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>Full business profile page</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>Photo gallery display</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>Direct contact links</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>Google Maps integration</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>SEO optimized Listing</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-stone-700">
+                                <Check size={16} className="text-green-500 flex-shrink-0" />
+                                <span>Mobile responsive design</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Right Column: Sticky Summary */}
+                <div className="md:col-span-1">
+                    <div className="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden sticky top-8">
+                        <div className="bg-stone-50 px-6 py-4 border-b border-stone-100">
+                             <h3 className="font-bold text-stone-900">Order Summary</h3>
+                        </div>
+                        <div className="p-6">
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-stone-700 mb-3">
+                                        Duration (Months)
+                                    </label>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleDurationChange(-1)}
+                                            className="w-10 h-10 rounded border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition-colors bg-white shadow-sm"
+                                        >
+                                            <Minus size={16} />
+                                        </button>
+                                        <div className="flex-1 relative">
+                                             <input
+                                                type="number"
+                                                value={durationMonths}
+                                                onChange={(e) => setDurationMonths(Math.max(1, Math.min(60, parseInt(e.target.value) || 0)))}
+                                                className="w-full h-10 text-center font-bold text-stone-900 border border-stone-200 rounded focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500"
+                                                min="1"
+                                                max="60"
+                                            />
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleDurationChange(1)}
+                                            className="w-10 h-10 rounded border border-stone-200 flex items-center justify-center text-stone-500 hover:bg-stone-50 hover:text-stone-900 transition-colors bg-white shadow-sm"
+                                        >
+                                            <Plus size={16} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-start text-sm pt-4 border-t border-stone-100">
+                                    <span className="text-stone-600">Rate</span>
+                                    <span className="font-medium text-stone-900">${COST_PER_MONTH}.00 / month</span>
+                                </div>
+                                <div className="h-px bg-stone-100 my-2" />
+                                <div className="flex justify-between items-center">
+                                    <span className="font-bold text-stone-900 text-lg">Total Due</span>
+                                    <span className="font-bold text-2xl text-orange-600">
+                                        ${totalCost}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <button
+                                    type="button"
+                                    onClick={handleSubmit}
+                                    disabled={isSubmitting || !isFormValid()}
+                                    className="w-full py-3.5 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 disabled:bg-stone-300 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                    {isSubmitting ? (
+                                        <>
+                                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                        Make Payment
+                                        <ChevronRight size={18} />
+                                        </>
+                                    )}
+                                </button>
+                                <div className="text-xs text-stone-500 text-center px-4 mt-2">
+                                    By clicking above, you agree to our Terms of Service and Privacy Policy.
+                                </div>
+                            </div>
+                            
+                            <div className="mt-8 pt-6 border-t border-stone-100 space-y-4">
+                                <div className="flex items-start gap-4">
+                                    <div className="w-8 h-8 flex items-center justify-center text-blue-600 shrink-0">
+                                        <CreditCard size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-xs text-stone-900 uppercase tracking-wide">Secure Online Payment</h4>
+                                        <p className="text-xs text-stone-500 mt-1">
+                                            Pay securely via Stripe. We accept all major credit cards.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-start gap-4">
+                                    <div className="w-8 h-8 flex items-center justify-center text-stone-600 shrink-0">
+                                        <Clock size={20} />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-xs text-stone-900 uppercase tracking-wide">Pay by Check</h4>
+                                        <p className="text-xs text-stone-500 mt-1">
+                                            Mail checks to our office. <a href="mailto:Donna@orangehousing.com" className="text-orange-600 hover:underline">Email Donna</a> for info.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
           </div>
         )}

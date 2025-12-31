@@ -22,9 +22,18 @@ interface DirectoryPageProps {
   addListingLink?: string;
   addListingText?: string;
   isPaidListing?: boolean;
+  isLoading?: boolean;
 }
 
-export function DirectoryPage({ title, subtitle, items, addListingLink, addListingText, isPaidListing = true }: DirectoryPageProps) {
+export function DirectoryPage({ 
+  title, 
+  subtitle, 
+  items, 
+  addListingLink, 
+  addListingText, 
+  isPaidListing = true,
+  isLoading = false 
+}: DirectoryPageProps) {
   return (
     <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">
       
@@ -75,80 +84,90 @@ export function DirectoryPage({ title, subtitle, items, addListingLink, addListi
 
       {/* Directory Grid */}
       <main className="flex-grow container mx-auto px-4 pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
-          {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 group flex flex-col">
-              <div className="h-40 md:h-48 overflow-hidden relative">
-                <img 
-                  src={item.image} 
-                  alt={item.name} 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-bold text-stone-800 uppercase tracking-wide">
-                  {item.category}
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mb-4" />
+            <p className="text-stone-500 font-medium font-serif">Loading directory...</p>
+          </div>
+        ) : items.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+            {items.map((item) => (
+              <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-stone-100 group flex flex-col">
+                <div className="h-40 md:h-48 overflow-hidden relative">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-3 left-3 md:top-4 md:left-4 bg-white/90 backdrop-blur-sm px-2 md:px-3 py-1 rounded-full text-[10px] md:text-xs font-bold text-stone-800 uppercase tracking-wide">
+                    {item.category}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="p-4 md:p-6 flex-grow flex flex-col">
-                <h3 className="text-lg md:text-xl font-bold text-stone-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">{item.name}</h3>
-                <p className="text-stone-500 text-xs md:text-sm mb-3 md:mb-4 line-clamp-2 flex-grow">{item.description}</p>
                 
-                <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t border-stone-100">
-                  <div className="flex items-start gap-2 md:gap-3 text-xs md:text-sm text-stone-600">
-                    <MapPin size={14} className="text-orange-500 shrink-0 mt-0.5" />
-                    <span className="line-clamp-1">{item.address}</span>
+                <div className="p-4 md:p-6 flex-grow flex flex-col">
+                  <h3 className="text-lg md:text-xl font-bold text-stone-900 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1 font-serif">{item.name}</h3>
+                  <p className="text-stone-500 text-xs md:text-sm mb-3 md:mb-4 line-clamp-2 flex-grow">{item.description}</p>
+                  
+                  <div className="space-y-2 md:space-y-3 pt-3 md:pt-4 border-t border-stone-100">
+                    <div className="flex items-start gap-2 md:gap-3 text-xs md:text-sm text-stone-600">
+                      <MapPin size={14} className="text-orange-500 shrink-0 mt-0.5" />
+                      <span className="line-clamp-1">{item.address}</span>
+                    </div>
+                    
+                    {item.website && (
+                      <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm text-stone-600">
+                        <Globe size={14} className="text-orange-500 shrink-0" />
+                        <a href={item.website} target="_blank" rel="noreferrer" className="hover:text-orange-600 hover:underline truncate">
+                          Visit Website
+                        </a>
+                      </div>
+                    )}
                   </div>
                   
-                  {item.website && (
-                    <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm text-stone-600">
-                      <Globe size={14} className="text-orange-500 shrink-0" />
-                      <a href={item.website} target="_blank" rel="noreferrer" className="hover:text-orange-600 hover:underline truncate">
-                        Visit Website
+                  {/* Action Buttons */}
+                  <div className="mt-4 md:mt-6 grid grid-cols-2 gap-2 md:gap-3">
+                    {item.phone && (
+                      <a 
+                        href={`tel:${item.phone}`}
+                        className="py-2 md:py-2.5 border border-stone-200 rounded-lg text-center text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm"
+                      >
+                        <Phone size={14} />
+                        <span>Call Now</span>
                       </a>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="mt-4 md:mt-6 grid grid-cols-2 gap-2 md:gap-3">
-                  {item.phone && (
-                    <a 
-                      href={`tel:${item.phone}`}
-                      className="py-2 md:py-2.5 border border-stone-200 rounded-lg text-center text-stone-600 font-medium hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm"
-                    >
-                      <Phone size={14} />
-                      <span>Call Now</span>
-                    </a>
-                  )}
-                  {item.email ? (
-                    <a 
-                      href={`mailto:${item.email}`}
-                      className="py-2 md:py-2.5 bg-orange-600 text-white rounded-lg text-center font-medium hover:bg-orange-700 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm shadow-sm"
-                    >
-                      <Mail size={14} />
-                      <span>Email</span>
-                    </a>
-                  ) : item.website ? (
-                    <a 
-                      href={item.website}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="py-2 md:py-2.5 bg-orange-600 text-white rounded-lg text-center font-medium hover:bg-orange-700 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm shadow-sm"
-                    >
-                      <Globe size={14} />
-                      <span>Website</span>
-                    </a>
-                  ) : null}
-                  {!item.phone && !item.email && !item.website && (
-                    <div className="col-span-2 py-2 md:py-2.5 border border-stone-200 rounded-lg text-center text-stone-400 text-xs md:text-sm">
-                      Contact info coming soon
-                    </div>
-                  )}
+                    )}
+                    {item.email ? (
+                      <a 
+                        href={`mailto:${item.email}`}
+                        className="py-2 md:py-2.5 bg-orange-600 text-white rounded-lg text-center font-medium hover:bg-orange-700 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm shadow-sm"
+                      >
+                        <Mail size={14} />
+                        <span>Email</span>
+                      </a>
+                    ) : item.website ? (
+                      <a 
+                        href={item.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="py-2 md:py-2.5 bg-orange-600 text-white rounded-lg text-center font-medium hover:bg-orange-700 transition-colors flex items-center justify-center gap-1.5 md:gap-2 text-xs md:text-sm shadow-sm"
+                      >
+                        <Globe size={14} />
+                        <span>Website</span>
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="max-w-md mx-auto bg-white rounded-2xl p-12 text-center border border-stone-100 shadow-sm">
+            <div className="w-20 h-20 bg-stone-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Search size={32} className="text-stone-300" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-xl font-bold text-stone-900 mb-2 font-serif">No Results Found</h3>
+            <p className="text-stone-500 text-sm">We couldn't find any listings in this category. Check back soon!</p>
+          </div>
+        )}
       </main>
 
       {/* Add Listing CTA - Bottom */}

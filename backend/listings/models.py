@@ -58,21 +58,45 @@ class BuildingType(models.Model):
         return self.name
 
 
+class Utility(models.Model):
+    """Lookup table for utilities"""
+    
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        db_table = 'lookup_utilities'
+        managed = True
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
+
 # ==================== MAIN MODELS ====================
 
 class Listing(models.Model):
     """Property listing model matching the listings table in structure.sql"""
     
     id = models.AutoField(primary_key=True)
+    listing_title = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=255, null=True, blank=True)
     zip = models.IntegerField(null=True, blank=True)
     unit = models.IntegerField(default=0)
     beds = models.IntegerField(null=True, blank=True)
     baths = models.CharField(max_length=3, null=True, blank=True)
     rent = models.IntegerField(null=True, blank=True)
-    utilities = models.CharField(max_length=7, null=True, blank=True)
+    utilities = models.CharField(max_length=255, null=True, blank=True)
+    utilities_m2m = models.ManyToManyField(
+        Utility,
+        related_name='listings',
+        blank=True,
+        db_table='listings_listing_utilities' 
+    )
     pets = models.CharField(max_length=5, null=True, blank=True)
     details = models.TextField(null=True, blank=True)
+
     
     # Foreign key to User
     user = models.ForeignKey(
@@ -95,6 +119,22 @@ class Listing(models.Model):
     # Status fields
     visible = models.BooleanField(default=True)
     featured = models.IntegerField(default=0)
+    is_public = models.BooleanField(default=False)
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True)
+    stripe_payment_link = models.CharField(max_length=255, null=True, blank=True)
+    stripe_payment_method_id = models.CharField(max_length=255, null=True, blank=True)
+    
+    # Approval workflow
+    approval_status = models.CharField(max_length=20, default='draft') # draft, pending, changes_requested, approved, rejected
+    admin_feedback = models.TextField(null=True, blank=True)
+
+    # Social Media Posting
+    social_media_posting = models.BooleanField(default=False)
+    social_media_posted = models.BooleanField(default=False)
+    social_media_post_id = models.CharField(max_length=255, null=True, blank=True)
+    social_media_error = models.TextField(null=True, blank=True)
+
+
     
     # Location and property details (using lookup tables)
     location_ref = models.ForeignKey(

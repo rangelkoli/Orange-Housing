@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+export type UserRole = 'landlord' | 'admin' | 'user';
+
 export interface LandlordUser {
     id: number;
     email: string;
@@ -8,7 +10,11 @@ export interface LandlordUser {
     firstName?: string;
     lastName?: string;
     company?: string;
+    contactNumber?: string;
     createdAt?: string;
+    lastLogin?: string;
+    role?: UserRole;
+    userLevel?: number;
 }
 
 interface AuthState {

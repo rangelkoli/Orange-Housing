@@ -65,14 +65,14 @@ export default function AdminDashboard() {
               <div className={`p-3 rounded-lg ${stat.bg} ${stat.color}`}>
                 <stat.icon size={24} />
               </div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${stat.trend === 'up' ? 'text-green-600' : stat.trend === 'down' ? 'text-red-600' : 'text-stone-500'}`}>
+              <div className={`flex items-center gap-1 text-[10px] font-display font-bold ${stat.trend === 'up' ? 'text-green-600' : stat.trend === 'down' ? 'text-red-600' : 'text-stone-500'}`}>
                 {stat.change}
-                {stat.trend === 'up' && <ArrowUpRight size={16} />}
-                {stat.trend === 'down' && <ArrowDownRight size={16} />}
+                {stat.trend === 'up' && <ArrowUpRight size={14} />}
+                {stat.trend === 'down' && <ArrowDownRight size={14} />}
               </div>
             </div>
-            <h3 className="text-3xl font-bold text-stone-900 mb-1">{stat.value}</h3>
-            <p className="text-stone-500 font-medium">{stat.label}</p>
+            <h3 className="text-3xl font-serif font-bold text-stone-900 mb-1">{stat.value}</h3>
+            <p className="text-[10px] text-stone-500 font-display font-bold uppercase tracking-[0.2em]">{stat.label}</p>
           </div>
         ))}
       </div>
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
         <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-6">
-          <h2 className="text-lg font-bold text-stone-900 mb-6">Recent Activity</h2>
+          <h2 className="text-lg font-serif font-bold text-stone-900 mb-6">Recent Activity</h2>
           <div className="space-y-6">
             {recentActivity.map((item, idx) => (
               <div key={idx} className="flex items-start gap-4">
@@ -100,7 +100,7 @@ export default function AdminDashboard() {
 
         {/* Quick Actions Placeholder */}
         <div className="bg-white rounded-xl shadow-sm border border-stone-100 p-6">
-          <h2 className="text-lg font-bold text-stone-900 mb-6">System Status</h2>
+          <h2 className="text-lg font-serif font-bold text-stone-900 mb-6">System Status</h2>
           <div className="space-y-4">
              <div className="flex items-center justify-between p-4 bg-stone-50 rounded-lg">
                 <span className="font-medium text-stone-700">Database Status</span>

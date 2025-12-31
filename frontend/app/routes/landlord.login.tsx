@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { Eye, EyeOff, Building2, Mail, Lock, ArrowRight, CheckCircle2, Shield, AlertTriangle, X } from "lucide-react";
+import { Eye, EyeOff, Building2, Mail, Lock, ArrowRight, CheckCircle2, Shield, AlertTriangle, X, User } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
+import { Logo } from "@/components/Navbar";
 
 // Password Update Modal Component
 interface PasswordUpdateModalProps {
@@ -72,7 +73,7 @@ function PasswordUpdateModal({ isOpen, onClose, email, oldPassword, onSuccess }:
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 overflow-hidden animate-in fade-in zoom-in duration-200">
         {/* Header */}
         <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-5">
           <div className="flex items-center justify-between">
@@ -213,7 +214,7 @@ function SuccessToast({ message, onClose }: { message: string; onClose: () => vo
 export default function LandlordLogin() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated } = useAuthStore();
+  const { login, isAuthenticated, user } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -227,17 +228,30 @@ export default function LandlordLogin() {
   const [pendingUser, setPendingUser] = useState<any>(null);
   const [showSuccessToast, setShowSuccessToast] = useState(false);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated based on role
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       const returnUrl = searchParams.get("returnUrl");
-      navigate(returnUrl ? decodeURIComponent(returnUrl) : "/landlord/dashboard", { replace: true });
+      if (returnUrl) {
+        navigate(decodeURIComponent(returnUrl), { replace: true });
+      } else if (user.role === 'admin') {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/landlord/dashboard", { replace: true });
+      }
     }
-  }, [isAuthenticated, navigate, searchParams]);
+  }, [isAuthenticated, user, navigate, searchParams]);
 
-  const getReturnUrl = () => {
+  const getReturnUrl = (role?: string) => {
     const returnUrl = searchParams.get("returnUrl");
-    return returnUrl ? decodeURIComponent(returnUrl) : "/landlord/dashboard";
+    if (returnUrl) {
+      return decodeURIComponent(returnUrl);
+    }
+    // Redirect based on role
+    if (role === 'admin') {
+      return '/admin/dashboard';
+    }
+    return '/landlord/dashboard';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -277,10 +291,12 @@ export default function LandlordLogin() {
         firstName: data.user.first_name,
         lastName: data.user.last_name,
         company: data.user.company,
+        role: data.user.role,
+        userLevel: data.user.user_level,
       });
       
-      // Redirect to returnUrl or dashboard
-      navigate(getReturnUrl());
+      // Redirect based on role
+      navigate(getReturnUrl(data.user.role));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -301,11 +317,13 @@ export default function LandlordLogin() {
         firstName: pendingUser.first_name,
         lastName: pendingUser.last_name,
         company: pendingUser.company,
+        role: pendingUser.role,
+        userLevel: pendingUser.user_level,
       });
     }
     
     setTimeout(() => {
-      navigate(getReturnUrl());
+      navigate(getReturnUrl(pendingUser?.role));
     }, 1500);
   };
 
@@ -321,14 +339,19 @@ export default function LandlordLogin() {
         firstName: pendingUser.first_name,
         lastName: pendingUser.last_name,
         company: pendingUser.company,
+        role: pendingUser.role,
+        userLevel: pendingUser.user_level,
       });
     }
-    navigate(getReturnUrl());
+    navigate(getReturnUrl(pendingUser?.role));
   };
 
 
   return (
-    <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">
+    <div className="min-h-screen bg-[#FDF8F3] font-sans text-stone-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Pattern (Optional subtle dots) */}
+      <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'radial-gradient(#E5E7EB 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+      
       {/* Success Toast */}
       {showSuccessToast && (
         <SuccessToast 
@@ -346,55 +369,59 @@ export default function LandlordLogin() {
         onSuccess={handlePasswordUpdateSuccess}
       />
 
-      <main className="flex-grow flex items-center justify-center py-12 px-4">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-100">
-          
-          {/* Left Side - Form */}
-          <div className="p-8 md:p-12 lg:p-16 flex flex-col justify-center">
+      <div className="w-full max-w-[480px] relative z-10 flex flex-col items-center">
+        
+        {/* Logo Section */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Link to="/" className="mb-4">
+            <Logo  />
+          </Link>
+        </div>
+
+        {/* Main Card */}
+        <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+          <div className="p-8 pb-6">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-stone-900 mb-2">
-                Welcome Back, Partner
+              <h1 className="text-2xl font-bold text-stone-900 mb-2">
+                Welcome Back
               </h1>
-              <p className="text-stone-500">
-                Log in to manage your listings and view inquiries.
+              <p className="text-stone-500 text-sm leading-relaxed">
+                Sign in to manage your properties, view saved listings, and contact tenants.
               </p>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
-                {error}
+              <div className="w-full mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4" />
+                <span>{error}</span>
               </div>
             )}
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-stone-700">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-                  <input 
-                    type="email" 
-                    placeholder="name@company.com"
-                    className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required
-                  />
-                </div>
+                <input 
+                  type="email" 
+                  placeholder="name@example.com"
+                  className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                />
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium text-stone-700">Password</label>
-                  <Link to="#" className="text-xs font-medium text-orange-600 hover:underline">
-                    Forgot password?
+                  <Link to="#" className="text-xs font-bold text-orange-600 hover:text-orange-700">
+                    Forgot Password?
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
                   <input 
                     type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-11 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                    placeholder="Enter your password"
+                    className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     required
@@ -402,7 +429,7 @@ export default function LandlordLogin() {
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -412,65 +439,33 @@ export default function LandlordLogin() {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-base"
               >
-                {loading ? "Signing In..." : "Sign In to Dashboard"}
-                {!loading && <ArrowRight size={18} />}
+                {loading ? "Signing In..." : "Sign In"}
               </button>
             </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-stone-500 text-sm">
-                Don't have an account?{" "}
-                <Link 
-                  to="/landlord/signup"
-                  className="text-orange-600 font-bold hover:underline"
-                >
-                  Sign up now
-                </Link>
-              </p>
-            </div>
           </div>
 
-          {/* Right Side - Feature/Marketing */}
-          <div className="hidden lg:flex flex-col justify-between bg-stone-900 p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay" />
-            <div className="absolute inset-0 bg-gradient-to-b from-stone-900/0 via-stone-900/60 to-stone-900/90" />
-            
-            <div className="relative z-10">
-              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mb-6">
-                <Building2 size={24} className="text-white" />
-              </div>
-              <h2 className="text-3xl font-bold mb-4">Manage Your Properties with Ease</h2>
-              <p className="text-stone-300 leading-relaxed max-w-md">
-                Join Syracuse's premier housing network. Connect directly with verified students and professionals looking for their next home.
-              </p>
-            </div>
-
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Verified Tenant Leads</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Automated Listing Management</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Direct Messaging System</span>
-              </div>
-            </div>
+          <div className="bg-stone-50 p-4 border-t border-stone-100 text-center">
+             <p className="text-stone-600 text-sm">
+               New to Orange Housing?{" "}
+               <Link 
+                 to="/landlord/signup"
+                 className="text-orange-600 font-bold hover:underline"
+               >
+                 Create an account
+               </Link>
+             </p>
           </div>
-
         </div>
-      </main>
+
+        <div className="mt-8 flex gap-6 text-stone-500 text-xs font-medium">
+          <Link to="#" className="hover:text-stone-800 transition-colors">Privacy Policy</Link>
+          <Link to="#" className="hover:text-stone-800 transition-colors">Terms of Service</Link>
+          <Link to="#" className="hover:text-stone-800 transition-colors">Help Center</Link>
+        </div>
+
+      </div>
     </div>
   );
 }

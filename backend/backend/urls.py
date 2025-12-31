@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 def health_check(request):
@@ -33,4 +35,21 @@ urlpatterns = [
     path("health/", health_check, name="health_check"),
     path("users/", include("users.urls")),
     path("listings/", include("listings.urls")),
+    path("ads/", include("ads.urls")),
+    path("directory/", include("directory.urls")),
+    path("payments/", include("payments.urls")),
+
+    # API aliases for frontend compatibility
+    path("api/users/", include("users.urls")),
+    path("api/listings/", include("listings.urls")),
+    path("api/ads/", include("ads.urls")),
+    path("api/directory/", include("directory.urls")),
+    path("api/payments/", include("payments.urls")),
+
 ]
+
+
+# Serve media files during development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

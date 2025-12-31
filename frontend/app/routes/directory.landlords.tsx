@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router";
 import {
   Search,
@@ -34,90 +34,42 @@ interface LandlordItem {
 
 export default function LandlordsDirectoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [landlords, setLandlords] = useState<LandlordItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const landlords: LandlordItem[] = [
-    {
-      id: 1,
-      name: "John Smith Properties",
-      description: "Experienced landlord with over 20 years in Syracuse real estate. Specializing in student housing near SU campus with responsive maintenance.",
-      neighborhoods: ["University Hill", "Westcott", "Euclid"],
-      phone: "(315) 555-0101",
-      email: "john@example.com",
-      website: "https://example.com",
-      yearsActive: 20,
-      propertyCount: 15,
-      verified: true,
-      category: "Individual Landlord"
-    },
-    {
-      id: 2,
-      name: "Maria Rodriguez Rentals",
-      description: "Family-owned rental business offering quality homes and apartments throughout Syracuse neighborhoods. Known for fair pricing and excellent communication.",
-      neighborhoods: ["Eastwood", "Sedgwick", "North Valley"],
-      phone: "(315) 555-0202",
-      email: "maria@example.com",
-      yearsActive: 12,
-      propertyCount: 8,
-      verified: true,
-      category: "Family Business"
-    },
-    {
-      id: 3,
-      name: "University District Landlords",
-      description: "Collective of landlords focused on providing safe, affordable housing for Syracuse University students. Online applications available.",
-      neighborhoods: ["University Hill", "Syracuse Univ", "Comstock"],
-      phone: "(315) 555-0303",
-      email: "info@udlandlords.com",
-      website: "https://example.com",
-      propertyCount: 50,
-      verified: true,
-      category: "Landlord Group"
-    },
-    {
-      id: 4,
-      name: "Thompson Family Homes",
-      description: "Third-generation Syracuse landlords. We take pride in maintaining our properties and building lasting relationships with tenants.",
-      neighborhoods: ["Tipperary Hill", "Geddes", "Westvale"],
-      phone: "(315) 555-0404",
-      email: "thompson@example.com",
-      yearsActive: 35,
-      propertyCount: 12,
-      verified: false,
-      category: "Family Business"
-    },
-    {
-      id: 5,
-      name: "Chen Housing Solutions",
-      description: "Modern apartments with updated amenities. Flexible lease terms available for graduate students and young professionals.",
-      neighborhoods: ["Downtown", "Armory Square", "Clinton Square"],
-      phone: "(315) 555-0505",
-      email: "chen@example.com",
-      website: "https://example.com",
-      yearsActive: 8,
-      propertyCount: 6,
-      verified: true,
-      category: "Individual Landlord"
-    },
-    {
-      id: 6,
-      name: "Syracuse Student Housing Co-op",
-      description: "Non-profit cooperative offering affordable housing options for students. Community-focused with shared resources.",
-      neighborhoods: ["University Hill", "Meadbrook"],
-      phone: "(315) 555-0606",
-      email: "coop@example.com",
-      propertyCount: 25,
-      verified: true,
-      category: "Housing Co-op"
-    },
-  ];
+  useEffect(() => {
+    const fetchLandlords = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/directory/landlords/");
+        const result = await response.json();
+        if (result.success) {
+          const mappedData = result.data.map((item: any) => ({
+            id: item.id,
+            name: item.name || "Unnamed Landlord",
+            description: item.contact_name ? `Contact: ${item.contact_name}` : "Trusted Syracuse landlord.",
+            neighborhoods: [],
+            phone: item.phone,
+            email: item.email,
+            website: item.url,
+            verified: true,
+            category: item.category || "Landlord"
+          }));
+          setLandlords(mappedData);
+        }
+      } catch (error) {
+        console.error("Error fetching landlords:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLandlords();
+  }, []);
 
   // Filter landlords based on search
   const filteredLandlords = landlords.filter(
     (landlord) =>
       landlord.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      landlord.neighborhoods.some((n) =>
-        n.toLowerCase().includes(searchQuery.toLowerCase())
-      ) ||
       landlord.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -192,7 +144,7 @@ export default function LandlordsDirectoryPage() {
             />
             <input
               type="text"
-              placeholder="Search by landlord name, neighborhood, or category..."
+              placeholder="Search by landlord name or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm md:text-base"
@@ -205,8 +157,7 @@ export default function LandlordsDirectoryPage() {
       <div className="container mx-auto px-4 mb-4">
         <div className="max-w-5xl mx-auto">
           <p className="text-stone-500 text-sm">
-            Showing {filteredLandlords.length} landlord
-            {filteredLandlords.length !== 1 ? "s" : ""}
+            {isLoading ? "Fetching landlords..." : `Showing ${filteredLandlords.length} landlord${filteredLandlords.length !== 1 ? "s" : ""}`}
           </p>
         </div>
       </div>
@@ -214,122 +165,129 @@ export default function LandlordsDirectoryPage() {
       {/* Landlords Grid */}
       <main className="flex-grow container mx-auto px-4 pb-12">
         <div className="max-w-5xl mx-auto space-y-4">
-          {filteredLandlords.map((landlord) => (
-            <div
-              key={landlord.id}
-              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-stone-100"
-            >
-              <div className="p-4 md:p-6">
-                <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0">
-                    <div
-                      className={`w-16 h-16 md:w-20 md:h-20 ${getAvatarColor(
-                        landlord.name
-                      )} rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-md`}
-                    >
-                      {getInitials(landlord.name)}
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-12 h-12 border-4 border-orange-200 border-t-orange-600 rounded-full animate-spin mb-4" />
+              <p className="text-stone-500 font-medium">Loading directory...</p>
+            </div>
+          ) : filteredLandlords.length > 0 ? (
+            filteredLandlords.map((landlord) => (
+              <div
+                key={landlord.id}
+                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-stone-100"
+              >
+                <div className="p-4 md:p-6">
+                  <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
+                    {/* Avatar */}
+                    <div className="flex-shrink-0">
+                      <div
+                        className={`w-16 h-16 md:w-20 md:h-20 ${getAvatarColor(
+                          landlord.name
+                        )} rounded-xl flex items-center justify-center text-white font-bold text-xl md:text-2xl shadow-md`}
+                      >
+                        {getInitials(landlord.name)}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Main Content */}
-                  <div className="flex-grow">
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3 mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-lg md:text-xl font-bold text-stone-900 font-serif">
-                            {landlord.name}
-                          </h3>
-                          {landlord.verified && (
-                            <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] md:text-xs font-semibold px-1.5 md:px-2 py-0.5 rounded-full">
-                              <Shield size={10} />
-                              Verified
-                            </span>
+                    {/* Main Content */}
+                    <div className="flex-grow">
+                      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2 md:gap-3 mb-3">
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="text-lg md:text-xl font-bold text-stone-900 font-serif">
+                              {landlord.name}
+                            </h3>
+                            {landlord.verified && (
+                              <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-[10px] md:text-xs font-semibold px-1.5 md:px-2 py-0.5 rounded-full">
+                                <Shield size={10} />
+                                Verified
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs md:text-sm text-orange-600 font-medium">
+                            {landlord.category}
+                          </span>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-stone-500">
+                          {landlord.yearsActive && (
+                            <div className="flex items-center gap-1">
+                              <Calendar size={12} className="text-stone-400" />
+                              <span>{landlord.yearsActive} yrs</span>
+                            </div>
+                          )}
+                          {landlord.propertyCount && (
+                            <div className="flex items-center gap-1">
+                              <Home size={12} className="text-stone-400" />
+                              <span>{landlord.propertyCount} properties</span>
+                            </div>
                           )}
                         </div>
-                        <span className="text-xs md:text-sm text-orange-600 font-medium">
-                          {landlord.category}
-                        </span>
                       </div>
 
-                      {/* Stats */}
-                      <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-stone-500">
-                        {landlord.yearsActive && (
-                          <div className="flex items-center gap-1">
-                            <Calendar size={12} className="text-stone-400" />
-                            <span>{landlord.yearsActive} yrs</span>
-                          </div>
-                        )}
-                        {landlord.propertyCount && (
-                          <div className="flex items-center gap-1">
-                            <Home size={12} className="text-stone-400" />
-                            <span>{landlord.propertyCount} properties</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                      <p className="text-stone-600 text-xs md:text-sm mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
+                        {landlord.description}
+                      </p>
 
-                    <p className="text-stone-600 text-xs md:text-sm mb-3 md:mb-4 leading-relaxed line-clamp-2 md:line-clamp-none">
-                      {landlord.description}
-                    </p>
+                      {/* Neighborhoods/Address Placeholder if any */}
+                      {landlord.neighborhoods && landlord.neighborhoods.length > 0 && (
+                        <div className="flex items-start gap-2 mb-4">
+                          <MapPin
+                            size={14}
+                            className="text-orange-500 shrink-0 mt-0.5"
+                          />
+                          <div className="flex flex-wrap gap-1.5">
+                            {landlord.neighborhoods.map((neighborhood) => (
+                              <span
+                                key={neighborhood}
+                                className="bg-stone-100 text-stone-600 text-xs px-2 py-0.5 rounded-full"
+                              >
+                                {neighborhood}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                    {/* Neighborhoods */}
-                    <div className="flex items-start gap-2 mb-4">
-                      <MapPin
-                        size={14}
-                        className="text-orange-500 shrink-0 mt-0.5"
-                      />
-                      <div className="flex flex-wrap gap-1.5">
-                        {landlord.neighborhoods.map((neighborhood) => (
-                          <span
-                            key={neighborhood}
-                            className="bg-stone-100 text-stone-600 text-xs px-2 py-0.5 rounded-full"
+                      {/* Contact Buttons */}
+                      <div className="flex flex-wrap gap-2 md:gap-3">
+                        {landlord.phone && (
+                          <a
+                            href={`tel:${landlord.phone}`}
+                            className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
                           >
-                            {neighborhood}
-                          </span>
-                        ))}
+                            <FaPhone size={10} />
+                            <span>Call Now</span>
+                          </a>
+                        )}
+                        {landlord.email && (
+                          <a
+                            href={`mailto:${landlord.email}`}
+                            className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-xs md:text-sm hover:bg-orange-700 transition-all shadow-sm"
+                          >
+                            <Mail size={12} />
+                            <span>Email</span>
+                          </a>
+                        )}
+                        {landlord.website && (
+                          <a
+                            href={landlord.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
+                          >
+                            <Globe size={12} />
+                            <span>Website</span>
+                          </a>
+                        )}
                       </div>
-                    </div>
-
-                    {/* Contact Buttons */}
-                    <div className="flex flex-wrap gap-2 md:gap-3">
-                      {landlord.phone && (
-                        <a
-                          href={`tel:${landlord.phone}`}
-                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
-                        >
-                          <FaPhone size={10} />
-                          <span>Call Now</span>
-                        </a>
-                      )}
-                      {landlord.email && (
-                        <a
-                          href={`mailto:${landlord.email}`}
-                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 bg-orange-600 text-white rounded-lg font-medium text-xs md:text-sm hover:bg-orange-700 transition-all shadow-sm"
-                        >
-                          <Mail size={12} />
-                          <span>Email</span>
-                        </a>
-                      )}
-                      {landlord.website && (
-                        <a
-                          href={landlord.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 border border-stone-200 rounded-lg text-stone-600 font-medium text-xs md:text-sm hover:bg-stone-50 hover:text-stone-900 hover:border-stone-300 transition-all"
-                        >
-                          <Globe size={12} />
-                          <span>Website</span>
-                        </a>
-                      )}
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-
-          {filteredLandlords.length === 0 && (
+            ))
+          ) : (
             <div className="bg-white rounded-xl p-12 text-center border border-stone-100">
               <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search size={24} className="text-stone-400" />

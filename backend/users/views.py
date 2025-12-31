@@ -7,6 +7,20 @@ from django.http import JsonResponse
 from .models import User
 
 
+def get_client_ip(request):
+    """
+    Get the client IP address from the request.
+    Handles cases where the request comes through a proxy (X-Forwarded-For header).
+    """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        # X-Forwarded-For can contain multiple IPs, the first one is the client's
+        ip = x_forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def verify_md5_password(password, stored_hash, salt):
     """
     Verify password using MD5 hash (legacy format).
@@ -61,7 +75,7 @@ def signup(request):
                 first_name=first_name,
                 last_name=last_name,
                 contact_number=contact_number,
-                user_level=0,  # Default standard user
+                user_level=1,  # Default standard user
                 user_banned=User.BannedStatus.NOT_BANNED,
                 password_type=User.PasswordType.BCRYPT  # New users always use bcrypt
             )
@@ -114,11 +128,22 @@ def login(request):
                     requires_password_update = True  # User needs to update password
 
             if password_valid:
-                # Update login info
+                # Update login info and IP address
                 now = timezone.now()
+                client_ip = get_client_ip(request)
+                
                 user.user_last_login = user.user_login_time
                 user.user_login_time = now
+                user.last_ip = client_ip
                 user.save()
+
+                # Determine user role based on user_level
+                if user.user_level == 1:
+                    role = 'landlord'
+                elif user.user_level == 9:
+                    role = 'admin'
+                else:
+                    role = 'user'
 
                 response_data = {
                     'message': 'Login successful',
@@ -129,6 +154,7 @@ def login(request):
                         'last_name': user.last_name,
                         'is_banned': user.user_banned == User.BannedStatus.BANNED,
                         'user_level': user.user_level,
+                        'role': role,
                     },
                     'requires_password_update': requires_password_update
                 }
@@ -205,6 +231,98 @@ def update_password(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def get_profile(request):
+    """
+    Endpoint to get user profile information.
+    Requires user_id as a query parameter.
+    """
+    if request.method == 'GET':
+        try:
+            user_id = request.GET.get('userId')
+            
+            if not user_id:
+                return JsonResponse({'error': 'User ID is required'}, status=400)
+            
+            try:
+                user = User.objects.get(user_id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            
+            return JsonResponse({
+                'user': {
+                    'id': user.user_id,
+                    'email': user.user_email,
+                    'username': user.user_name,
+                    'firstName': user.first_name,
+                    'lastName': user.last_name,
+                    'contactNumber': user.contact_number,
+                    'createdAt': user.user_date.isoformat() if user.user_date else None,
+                    'lastLogin': user.user_login_time.isoformat() if user.user_login_time else None,
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt
+def update_profile(request):
+    """
+    Endpoint to update user profile information.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            user_id = data.get('userId')
+            
+            if not user_id:
+                return JsonResponse({'error': 'User ID is required'}, status=400)
+            
+            try:
+                user = User.objects.get(user_id=user_id)
+            except User.DoesNotExist:
+                return JsonResponse({'error': 'User not found'}, status=404)
+            
+            # Update fields if provided
+            if 'firstName' in data:
+                user.first_name = data['firstName']
+            if 'lastName' in data:
+                user.last_name = data['lastName']
+            if 'contactNumber' in data:
+                user.contact_number = data['contactNumber']
+            if 'username' in data:
+                # Check if username is unique
+                new_username = data['username']
+                if new_username:
+                    existing = User.objects.filter(user_name=new_username).exclude(user_id=user_id).first()
+                    if existing:
+                        return JsonResponse({'error': 'Username already taken'}, status=400)
+                user.user_name = new_username
+            
+            user.user_modified = timezone.now()
+            user.save()
+            
+            return JsonResponse({
+                'message': 'Profile updated successfully',
+                'user': {
+                    'id': user.user_id,
+                    'email': user.user_email,
+                    'username': user.user_name,
+                    'firstName': user.first_name,
+                    'lastName': user.last_name,
+                    'contactNumber': user.contact_number,
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 

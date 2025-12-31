@@ -10,7 +10,7 @@ export default function SubletDetailPage() {
     <ListingDetailPage
       listingId={listingId}
       listingType="sublets"
-      backLink="/sublets"
+      backLink="/listings?type=sublets"
       backLinkText="Sublets"
     />
   );

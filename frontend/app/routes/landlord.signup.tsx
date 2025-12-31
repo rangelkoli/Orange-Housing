@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Eye, EyeOff, Building2, Mail, Lock, ArrowRight, CheckCircle2, User, Phone } from "lucide-react";
+import { Logo } from "@/components/Navbar";
 
 export default function LandlordSignup() {
   const navigate = useNavigate();
@@ -52,101 +53,100 @@ export default function LandlordSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2EB] font-sans text-stone-900 flex flex-col">
-      <main className="flex-grow flex items-center justify-center py-12 px-4">
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-stone-100">
-          
-          {/* Left Side - Form */}
-          <div className="p-8 md:p-12 lg:p-16 flex flex-col justify-center">
+    <div className="min-h-screen bg-[#FDF8F3] font-sans text-stone-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Pattern (Optional subtle dots) */}
+      <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'radial-gradient(#E5E7EB 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+
+      <div className="w-full max-w-[480px] relative z-10 flex flex-col items-center">
+        
+        {/* Logo Section */}
+        <div className="mb-8 flex flex-col items-center text-center">
+          <Link to="/" className="mb-4">
+            <Logo />
+          </Link>
+        </div>
+
+        {/* Main Card */}
+        <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+          <div className="p-8 pb-6">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-stone-900 mb-2">
-                Join Our Network
+              <h1 className="text-2xl font-serif font-bold text-stone-900 mb-2">
+                Join Us!
               </h1>
-              <p className="text-stone-500">
-                Create an account to list your properties and reach thousands of students.
+              <p className="text-stone-500 text-sm leading-relaxed">
+                Create an account to start listing properties and reach thousands of potential tenants.
               </p>
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
-                {error}
+              <div className="w-full mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100 flex items-center gap-2">
+                <div className="w-4 h-4 flex items-center justify-center rounded-full bg-red-100 text-red-600 font-bold text-xs">!</div>
+                <span>{error}</span>
               </div>
             )}
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-stone-700">First Name</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-                    <input 
-                      type="text" 
-                      name="firstName"
-                      placeholder="John"
-                      className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
+                  <input 
+                    type="text" 
+                    name="firstName"
+                    placeholder="John"
+                    className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium text-stone-700">Last Name</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      name="lastName"
-                      placeholder="Doe"
-                      className="w-full pl-4 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-stone-700">Contact Number</label>
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
-                    <input 
-                      type="tel" 
-                      name="contactNumber"
-                      placeholder="(555) 123-4567"
-                      className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                      value={formData.contactNumber}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-stone-700">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
                   <input 
-                    type="email" 
-                    name="email"
-                    placeholder="name@company.com"
-                    className="w-full pl-11 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
-                    value={formData.email}
+                    type="text" 
+                    name="lastName"
+                    placeholder="Doe"
+                    className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
+                    value={formData.lastName}
                     onChange={handleChange}
                     required
                   />
                 </div>
               </div>
 
+               <div className="space-y-1.5">
+                  <label className="text-sm font-medium text-stone-700">Contact Number</label>
+                  <input 
+                    type="tel" 
+                    name="contactNumber"
+                    placeholder="(555) 123-4567"
+                    className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
+                    value={formData.contactNumber}
+                    onChange={handleChange}
+                    required
+                  />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-stone-700">Email Address</label>
+                <input 
+                  type="email" 
+                  name="email"
+                  placeholder="name@company.com"
+                  className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-stone-700">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" size={18} />
                   <input 
                     type={showPassword ? "text" : "password"} 
                     name="password"
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-11 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                    placeholder="Create a strong password"
+                    className="w-full px-4 py-3 bg-white border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-base placeholder:text-stone-300"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -154,7 +154,7 @@ export default function LandlordSignup() {
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 p-1"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -164,65 +164,33 @@ export default function LandlordSignup() {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-orange-500/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-base"
               >
-                {loading ? "Creating Account..." : "Create Landlord Account"}
-                {!loading && <ArrowRight size={18} />}
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
-
-            <div className="mt-8 text-center">
-              <p className="text-stone-500 text-sm">
-                Already have an account?{" "}
-                <Link 
-                  to="/landlord/login"
-                  className="text-orange-600 font-bold hover:underline"
-                >
-                  Log in
-                </Link>
-              </p>
-            </div>
           </div>
 
-          {/* Right Side - Feature/Marketing */}
-          <div className="hidden lg:flex flex-col justify-between bg-stone-900 p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1460317442991-0ec209397118?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay" />
-            <div className="absolute inset-0 bg-gradient-to-b from-stone-900/0 via-stone-900/60 to-stone-900/90" />
-            
-            <div className="relative z-10">
-              <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mb-6">
-                <Building2 size={24} className="text-white" />
-              </div>
-              <h2 className="text-3xl font-bold mb-4">Manage Your Properties with Ease</h2>
-              <p className="text-stone-300 leading-relaxed max-w-md">
-                Join Syracuse's premier housing network. Connect directly with verified students and professionals looking for their next home.
-              </p>
-            </div>
-
-            <div className="relative z-10 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Verified Tenant Leads</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Automated Listing Management</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-green-500/20 p-1 rounded-full">
-                  <CheckCircle2 size={16} className="text-green-400" />
-                </div>
-                <span className="text-sm font-medium text-stone-200">Direct Messaging System</span>
-              </div>
-            </div>
+          <div className="bg-stone-50 p-4 border-t border-stone-100 text-center">
+             <p className="text-stone-600 text-sm">
+               Already have an account?{" "}
+               <Link 
+                 to="/landlord/login"
+                 className="text-orange-600 font-bold hover:underline"
+               >
+                 Sign in
+               </Link>
+             </p>
           </div>
-
         </div>
-      </main>
+
+        <div className="mt-8 flex gap-6 text-stone-500 text-xs font-medium">
+          <Link to="#" className="hover:text-stone-800 transition-colors">Privacy Policy</Link>
+          <Link to="#" className="hover:text-stone-800 transition-colors">Terms of Service</Link>
+          <Link to="#" className="hover:text-stone-800 transition-colors">Help Center</Link>
+        </div>
+
+      </div>
     </div>
   );
 }

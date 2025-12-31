@@ -121,10 +121,10 @@ const defaultNavigationLinks: Navbar02NavItem[] = [
     icon: Home,
     submenu: true,
     items: [
-      { href: "/rentals", label: "All Rentals", description: "Browse all available rental properties", icon: Home },
-      { href: "/short-term", label: "Short-Term", description: "Temporary housing and furnished rentals", icon: Building2 },
-      { href: "/sublets", label: "Sublets", description: "Take over an existing lease", icon: ArrowRightLeft },
-      { href: "/rooms", label: "Rooms for Rent", description: "Find a room in a shared space", icon: Users },
+      { href: "/listings?type=rentals", label: "All Rentals", description: "Browse all available rental properties", icon: Home },
+      { href: "/listings?type=short-term", label: "Short-Term", description: "Temporary housing and furnished rentals", icon: Building2 },
+      { href: "/listings?type=sublets", label: "Sublets", description: "Take over an existing lease", icon: ArrowRightLeft },
+      { href: "/listings?type=rooms", label: "Rooms for Rent", description: "Find a room in a shared space", icon: Users },
     ],
   },
   {

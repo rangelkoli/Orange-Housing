@@ -18,8 +18,8 @@ export default function AdminNewBlogPost() {
     <AdminLayout title="Write New Post">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <Link to="/admin/blog" className="inline-flex items-center text-stone-500 hover:text-stone-900 transition-colors mb-4">
-            <ArrowLeft size={16} className="mr-2" />
+          <Link to="/admin/blog" className="inline-flex items-center text-stone-500 hover:text-stone-900 transition-colors mb-4 font-display text-[10px] font-bold uppercase tracking-widest">
+            <ArrowLeft size={14} className="mr-2" />
             Back to Blog Posts
           </Link>
         </div>
@@ -29,7 +29,7 @@ export default function AdminNewBlogPost() {
             {/* Title & Slug */}
             <div className="grid grid-cols-1 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-base">Post Title</Label>
+                <Label htmlFor="title" className="text-base font-serif font-bold">Post Title</Label>
                 <Input id="title" placeholder="Enter a catchy title..." className="text-lg font-medium" />
               </div>
             </div>

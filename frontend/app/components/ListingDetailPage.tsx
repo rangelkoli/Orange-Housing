@@ -22,10 +22,17 @@ import {
   Flag,
   ChevronLeft,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Zap,
+  Wifi,
+  User
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense, useMemo } from "react";
 import { Link } from "react-router";
+
+// Dynamically import ReactQuill for client-side only rendering
+const ReactQuill = lazy(() => import("react-quill-new"));
+import "react-quill-new/dist/quill.snow.css";
 import {
   Dialog,
   DialogContent,
@@ -96,6 +103,31 @@ export default function ListingDetailPage({
   const [listing, setListing] = useState<ListingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [destination, setDestination] = useState("Syracuse University, Syracuse, NY");
+  const [transportMode, setTransportMode] = useState("d"); // d=driving, w=walking, b=bicycling
+  const [contactInfo, setContactInfo] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState<'viewing' | 'availability'>('viewing');
+
+  // Message templates
+  const messageTemplates = {
+    viewing: "<p>Hello,</p><p><br></p><p>I am interested in this property and would love to schedule a viewing at your earliest convenience.</p><p><br></p><p>Please let me know what times work best for you.</p><p><br></p><p>Thank you!</p>",
+    availability: "<p>Hello,</p><p><br></p><p>I came across your listing and wanted to inquire if this property is still available.</p><p><br></p><p>If so, I would love to learn more about the move-in process.</p><p><br></p><p>Thank you!</p>"
+  };
+
+  const [message, setMessage] = useState(messageTemplates.viewing);
+  
+  // Quill configuration - no toolbar
+  const quillModules = useMemo(() => ({
+    toolbar: false,
+  }), []);
+
+  const quillFormats = ['bold', 'italic', 'underline', 'list'];
+
+  // Handle template change
+  const handleTemplateChange = (template: 'viewing' | 'availability') => {
+    setSelectedTemplate(template);
+    setMessage(messageTemplates[template]);
+  };
 
   // Fetch listing data from backend
   useEffect(() => {
@@ -106,7 +138,6 @@ export default function ListingDetailPage({
         
         const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://127.0.0.1:8000';
         const response = await fetch(`${backendUrl}/listings/${listingId}/`);
-        
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('Listing not found');
@@ -115,6 +146,7 @@ export default function ListingDetailPage({
         }
         
         const data = await response.json();
+        console.log(data);
         setListing(data.listing);
       } catch (err: any) {
         console.error('Error fetching listing:', err);
@@ -372,6 +404,49 @@ export default function ListingDetailPage({
                 <Button variant="outline" size="icon" className="h-10 w-10 text-stone-500 hover:text-red-600 hover:bg-red-50 border-stone-200 rounded-full">
                   <Heart className="h-4 w-4" />
                 </Button>
+                {/* Report Listing Button & Modal */}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="icon" className="h-10 w-10 text-stone-500 hover:text-red-600 hover:bg-red-50 border-stone-200 rounded-full">
+                      <Flag className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Report Listing</DialogTitle>
+                      <DialogDescription>
+                        Help us maintain a safe community. Why are you reporting this listing?
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <RadioGroup defaultValue="scam">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="scam" id="scam" />
+                          <Label htmlFor="scam">Fraudulent or Scam</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="inaccurate" id="inaccurate" />
+                          <Label htmlFor="inaccurate">Inaccurate Information</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="duplicate" id="duplicate" />
+                          <Label htmlFor="duplicate">Duplicate Listing</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="other" id="other" />
+                          <Label htmlFor="other">Other</Label>
+                        </div>
+                      </RadioGroup>
+                      <div className="grid gap-2">
+                        <Label htmlFor="details">Additional Details (Optional)</Label>
+                        <Textarea id="details" placeholder="Please provide any extra context..." />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">Submit Report</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
@@ -464,6 +539,63 @@ export default function ListingDetailPage({
                   </div>
                 ))}
               </div>
+
+              {/* Included Utilities - Moved from PreviewListingContent logic */}
+              {listing.utilities && listing.utilities.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-stone-100">
+                  <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-4">Utilities Included</h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                    {(Array.isArray(listing.utilities) ? listing.utilities : (listing.utilities as string).split(',')).map((utility, idx) => {
+                      if (!utility) return null;
+                      const utilityName = utility.trim();
+                      const lowerName = utilityName.toLowerCase();
+                      
+                      // Map utility names to their icons and colors
+                      let Icon = Zap;
+                      let iconColor = 'text-yellow-500';
+                      let bgColor = 'bg-yellow-50/50';
+                      let borderColor = 'border-yellow-200';
+                      
+                      if (lowerName.includes('heat') || lowerName.includes('gas')) {
+                        Icon = Flame;
+                        iconColor = 'text-orange-500';
+                        bgColor = 'bg-orange-50/50';
+                        borderColor = 'border-orange-200';
+                      } else if (lowerName.includes('water')) {
+                        Icon = Waves;
+                        iconColor = 'text-blue-500';
+                        bgColor = 'bg-blue-50/50';
+                        borderColor = 'border-blue-200';
+                      } else if (lowerName.includes('electric')) {
+                        Icon = Zap;
+                        iconColor = 'text-yellow-500';
+                        bgColor = 'bg-yellow-50/50';
+                        borderColor = 'border-yellow-200';
+                      } else if (lowerName.includes('wifi') || lowerName.includes('internet')) {
+                        Icon = Wifi;
+                        iconColor = 'text-green-500';
+                        bgColor = 'bg-green-50/50';
+                        borderColor = 'border-green-200';
+                      } else if (lowerName.includes('contact manager')) {
+                        Icon = User;
+                        iconColor = 'text-purple-500';
+                        bgColor = 'bg-purple-50/50';
+                        borderColor = 'border-purple-200';
+                      }
+                      
+                      return (
+                        <div 
+                          key={idx}
+                          className={`flex flex-col items-center justify-center p-4 ${bgColor} border ${borderColor} rounded-2xl transition-all hover:scale-[1.02]`}
+                        >
+                          <Icon className={`h-6 w-6 ${iconColor} mb-2`} />
+                          <span className="text-sm font-semibold text-stone-700 text-center">{utilityName}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </section>
 
             {/* Location */}
@@ -477,45 +609,110 @@ export default function ListingDetailPage({
                 )}
               </div>
               
-              {/* Map Placeholder */}
-              <div className="w-full h-80 bg-stone-100 rounded-3xl overflow-hidden relative group border border-stone-200 shadow-sm">
-                 <img 
-                  src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1000&auto=format&fit=crop" 
-                  alt="Map View" 
-                  className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+              {/* Map View - Directions Embed */}
+              <div className="w-full h-80 bg-stone-100 rounded-3xl overflow-hidden relative border border-stone-200 shadow-sm">
+                <iframe 
+                  width="100%" 
+                  height="100%" 
+                  title="map"
+                  src={`https://maps.google.com/maps?saddr=${encodeURIComponent(listing.physicalAddress || (listing.address + ", " + listing.city + ", NY"))}&daddr=${encodeURIComponent(destination)}&dirflg=${transportMode}&output=embed`}
+                  className="w-full h-full filter grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/5 group-hover:bg-transparent transition-colors">
-                  <Button variant="secondary" className="shadow-xl font-bold gap-2 h-12 px-6 rounded-full hover:scale-105 transition-transform">
-                    <MapPin className="h-4 w-4 text-orange-600" />
-                    View on Map
-                  </Button>
-                </div>
               </div>
 
-              {/* Commute Calculator Mock */}
-              <div className="bg-stone-50 rounded-2xl p-6 border border-stone-100">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">Destination</label>
-                    <select className="w-full p-3 bg-white border border-stone-200 rounded-xl text-sm font-medium text-stone-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20 shadow-sm">
-                      <option>Syracuse University</option>
-                      <option>SUNY ESF</option>
-                      <option>Upstate Medical</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-stone-400 uppercase tracking-wider">Mode</label>
-                    <div className="flex bg-stone-200/50 rounded-xl p-1 border border-stone-200">
-                      <button className="flex-1 py-2 text-xs font-bold rounded-lg bg-white shadow-sm text-stone-900 transition-all">Walk</button>
-                      <button className="flex-1 py-2 text-xs font-bold rounded-lg text-stone-500 hover:text-stone-900 transition-all">Bike</button>
-                      <button className="flex-1 py-2 text-xs font-bold rounded-lg text-stone-500 hover:text-stone-900 transition-all">Drive</button>
+              {/* Commute Calculator - Enterprise UI */}
+              <div className="bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden">
+                {/* Header */}
+                <div className="px-5 py-3 bg-stone-50/80 border-b border-stone-100">
+                  <span className="text-[11px] font-bold text-stone-500 uppercase tracking-widest">Commute Calculator</span>
+                </div>
+                
+                {/* Controls Row */}
+                <div className="p-5">
+                  <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+                    {/* Destination Input */}
+                    <div className="flex-1 min-w-0">
+                      <div className="relative">
+                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                        <input 
+                          type="text"
+                          value={destination}
+                          onChange={(e) => setDestination(e.target.value)}
+                          placeholder="Enter destination address..."
+                          className="w-full h-12 pl-11 pr-4 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-700 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-400 focus:bg-white transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="hidden lg:block w-px h-10 bg-stone-200" />
+
+                    {/* Transport Mode Toggle */}
+                    <div className="flex bg-stone-100 rounded-xl p-1 shrink-0">
+                      <button 
+                        onClick={() => setTransportMode('w')}
+                        className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                          transportMode === 'w' 
+                            ? 'bg-white shadow-sm text-stone-900 ring-1 ring-black/5' 
+                            : 'text-stone-500 hover:text-stone-700'
+                        }`}
+                      >
+                        <span>🚶</span>
+                        <span className="hidden sm:inline">Walk</span>
+                      </button>
+                      <button 
+                        onClick={() => setTransportMode('b')}
+                        className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                          transportMode === 'b' 
+                            ? 'bg-white shadow-sm text-stone-900 ring-1 ring-black/5' 
+                            : 'text-stone-500 hover:text-stone-700'
+                        }`}
+                      >
+                        <span>🚴</span>
+                        <span className="hidden sm:inline">Bike</span>
+                      </button>
+                      <button 
+                        onClick={() => setTransportMode('d')}
+                        className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
+                          transportMode === 'd' 
+                            ? 'bg-white shadow-sm text-stone-900 ring-1 ring-black/5' 
+                            : 'text-stone-500 hover:text-stone-700'
+                        }`}
+                      >
+                        <span>🚗</span>
+                        <span className="hidden sm:inline">Drive</span>
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-end gap-3 pb-2">
-                     <div className="text-right">
-                        <span className="block text-3xl font-bold text-stone-900 tracking-tight">5 min</span>
-                        <span className="text-xs text-stone-500 font-bold uppercase tracking-wide">Walking time</span>
-                     </div>
+
+                  {/* Quick Destinations */}
+                  <div className="flex items-center gap-3 mt-4 pt-4 border-t border-stone-100">
+                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider shrink-0">Popular:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { label: "Syracuse University", value: "Syracuse University, Syracuse, NY" },
+                        { label: "SUNY ESF", value: "SUNY ESF, Syracuse, NY" },
+                        { label: "Upstate Medical", value: "Upstate Medical University, Syracuse, NY" },
+                        { label: "Downtown", value: "Downtown Syracuse, NY" },
+                        { label: "Destiny USA", value: "Destiny USA, Syracuse, NY" },
+                      ].map((place) => (
+                        <button
+                          key={place.value}
+                          type="button"
+                          onClick={() => setDestination(place.value)}
+                          className={`px-3 py-1 text-[11px] font-semibold rounded-full border transition-all ${
+                            destination === place.value
+                              ? 'bg-orange-500 border-orange-500 text-white shadow-sm'
+                              : 'bg-white border-stone-200 text-stone-600 hover:border-orange-300 hover:text-orange-600'
+                          }`}
+                        >
+                          {place.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -528,11 +725,11 @@ export default function ListingDetailPage({
             <div className="sticky top-24 space-y-6">
               {/* Contact Card */}
               <Card className="p-6 border-stone-200 shadow-xl shadow-stone-200/50 bg-white rounded-3xl overflow-hidden">
-                <div className="mb-6 pb-6 border-b border-stone-100">
+                <div className=" pb-6 border-b border-stone-100">
                   <h3 className="text-xl font-bold text-stone-900">Contact Lister</h3>
                 </div>
                 
-                <div className="flex items-center gap-5 mb-6">
+                <div className="flex items-center gap-5">
                   <div className="h-16 w-16 rounded-full overflow-hidden border-2 border-white shadow-md ring-2 ring-stone-100 bg-stone-200 flex items-center justify-center">
                     <span className="text-2xl font-bold text-stone-500">
                       {listing.contact_name ? listing.contact_name.charAt(0).toUpperCase() : '?'}
@@ -566,11 +763,90 @@ export default function ListingDetailPage({
                 </div>
 
                 <form className="space-y-4">
-                  <Textarea 
-                    placeholder="I am interested in this property..." 
-                    className="resize-none bg-stone-50 border-stone-200 focus:border-orange-500 focus:ring-orange-500/20 rounded-xl p-4" 
-                    rows={4} 
-                  />
+                  <div className="space-y-3">
+                    <div className="flex flex-col">
+                      <label className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-1.5 block">Email or Phone Number *</label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-stone-400" />
+                        <input
+                          type="text"
+                          value={contactInfo}
+                          onChange={(e) => setContactInfo(e.target.value)}
+                          placeholder="Email or phone..."
+                          required
+                          className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium text-stone-700 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold text-stone-500 uppercase tracking-wider block">Message Template</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleTemplateChange('viewing')}
+                        className={`group relative flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all duration-300 ${
+                          selectedTemplate === 'viewing'
+                            ? 'bg-white border-orange-200 shadow-md shadow-orange-100/50 ring-1 ring-orange-100'
+                            : 'bg-stone-50 border-stone-200 text-stone-500 hover:border-orange-100 hover:bg-stone-50/80'
+                        }`}
+                      >
+                        <div className={`p-2 rounded-xl transition-colors ${
+                          selectedTemplate === 'viewing' ? 'bg-orange-100 text-orange-600' : 'bg-white text-stone-400 group-hover:text-orange-500'
+                        }`}>
+                          <Calendar className="h-5 w-5" />
+                        </div>
+                        <span className={`text-[13px] font-bold tracking-tight transition-colors ${
+                          selectedTemplate === 'viewing' ? 'text-stone-900' : 'text-stone-500'
+                        }`}>
+                          Schedule Viewing
+                        </span>
+                        {selectedTemplate === 'viewing' && (
+                          <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-orange-500" />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleTemplateChange('availability')}
+                        className={`group relative flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border transition-all duration-300 ${
+                          selectedTemplate === 'availability'
+                            ? 'bg-white border-orange-200 shadow-md shadow-orange-100/50 ring-1 ring-orange-100'
+                            : 'bg-stone-50 border-stone-200 text-stone-500 hover:border-orange-100 hover:bg-stone-50/80'
+                        }`}
+                      >
+                        <div className={`p-2 rounded-xl transition-colors ${
+                          selectedTemplate === 'availability' ? 'bg-orange-100 text-orange-600' : 'bg-white text-stone-400 group-hover:text-orange-500'
+                        }`}>
+                          <Mail className="h-5 w-5" />
+                        </div>
+                        <span className={`text-[13px] font-bold tracking-tight transition-colors ${
+                          selectedTemplate === 'availability' ? 'text-stone-900' : 'text-stone-500'
+                        }`}>
+                          Check Availability
+                        </span>
+                        {selectedTemplate === 'availability' && (
+                          <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-orange-500" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="quill-container bg-stone-50 border border-stone-200 rounded-xl overflow-hidden focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-500/20 transition-all">
+                    <Suspense fallback={
+                      <div className="h-32 flex items-center justify-center text-stone-400">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      </div>
+                    }>
+                      <ReactQuill
+                        theme="snow"
+                        value={message}
+                        onChange={setMessage}
+                        modules={quillModules}
+                        formats={quillFormats}
+                        placeholder="I am interested in this property..."
+                        className="[&_.ql-toolbar]:border-0 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-stone-200 [&_.ql-toolbar]:bg-white [&_.ql-container]:border-0 [&_.ql-editor]:min-h-[100px] [&_.ql-editor]:text-stone-700"
+                      />
+                    </Suspense>
+                  </div>
                   <Button className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 text-lg shadow-lg shadow-orange-200 rounded-xl transition-all hover:scale-[1.02]">
                     Send Message
                   </Button>
@@ -580,50 +856,6 @@ export default function ListingDetailPage({
                 </form>
               </Card>
 
-              {/* Report Listing Button & Modal */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" className="w-full text-stone-400 hover:text-red-600 hover:bg-red-50 gap-2 rounded-xl h-12">
-                    <Flag className="h-4 w-4" />
-                    Report this listing
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Report Listing</DialogTitle>
-                    <DialogDescription>
-                      Help us maintain a safe community. Why are you reporting this listing?
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <RadioGroup defaultValue="scam">
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="scam" id="scam" />
-                        <Label htmlFor="scam">Fraudulent or Scam</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="inaccurate" id="inaccurate" />
-                        <Label htmlFor="inaccurate">Inaccurate Information</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="duplicate" id="duplicate" />
-                        <Label htmlFor="duplicate">Duplicate Listing</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="other" id="other" />
-                        <Label htmlFor="other">Other</Label>
-                      </div>
-                    </RadioGroup>
-                    <div className="grid gap-2">
-                      <Label htmlFor="details">Additional Details (Optional)</Label>
-                      <Textarea id="details" placeholder="Please provide any extra context..." />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" className="bg-red-600 hover:bg-red-700 text-white">Submit Report</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
         </div>

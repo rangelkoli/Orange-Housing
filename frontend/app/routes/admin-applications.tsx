@@ -24,13 +24,13 @@ export default function AdminApplicationsPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Business Name</TableHead>
-              <TableHead>Contact Person</TableHead>
-              <TableHead>Contact Info</TableHead>
-              <TableHead>Date Applied</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">ID</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Business Name</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Contact Person</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Contact Info</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Date Applied</TableHead>
+              <TableHead className="text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Status</TableHead>
+              <TableHead className="text-right text-[10px] font-display font-bold uppercase tracking-[0.2em] text-stone-500">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

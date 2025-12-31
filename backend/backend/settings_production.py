@@ -156,18 +156,37 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # =============================================================================
-# MEDIA FILES CONFIGURATION (Optional: Google Cloud Storage)
+# MEDIA FILES CONFIGURATION (Cloudflare R2)
 # =============================================================================
 
-if os.environ.get("USE_GCS_STORAGE", "False").lower() in ("true", "1", "yes"):
-    from google.cloud import storage
+# Cloudflare R2 Configuration
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY")
+R2_BUCKET_NAME = os.environ.get("R2_BUCKET_NAME")
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID")
+R2_CUSTOM_DOMAIN = os.environ.get("R2_CUSTOM_DOMAIN")  # Optional: custom domain for public URLs
+
+if R2_ACCESS_KEY_ID and R2_SECRET_ACCESS_KEY and R2_BUCKET_NAME and R2_ACCOUNT_ID:
+    # Use Cloudflare R2 storage
+    R2_ENDPOINT_URL = f"https://{R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
     
-    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-    GS_BUCKET_NAME = os.environ.get("GCS_BUCKET_NAME", "your-bucket-name")
-    GS_PROJECT_ID = os.environ.get("GCS_PROJECT_ID", "your-project-id")
-    GS_DEFAULT_ACL = "publicRead"
-    MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+    STORAGES = {
+        "default": {
+            "BACKEND": "backend.storages.R2MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    
+    # Set MEDIA_URL to R2 public URL
+    if R2_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{R2_CUSTOM_DOMAIN}/"
+    else:
+        # Default R2 public URL format
+        MEDIA_URL = f"https://pub-{R2_ACCOUNT_ID}.r2.dev/"
 else:
+    # Fallback to local storage if R2 not configured
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
 
