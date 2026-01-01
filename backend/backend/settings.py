@@ -30,6 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "https://orange-housing.onrender.com",
+    "https://orange-housing.pages.dev",
 ]
 
 

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(","
 ALLOWED_HOSTS += [
     ".run.app",  # Cloud Run default URLs
     ".appspot.com",  # App Engine
+    "orange-housing.onrender.com",  # Custom domain
 ]
 
 # CSRF trusted origins for Cloud Run
