@@ -1,7 +1,6 @@
 {
     "name": "orangehousing",
     "compatibility_date": "2025-12-31",
-    "main": "build/server/index.js",
     "assets": {
         "directory": "./build/client"
     }
