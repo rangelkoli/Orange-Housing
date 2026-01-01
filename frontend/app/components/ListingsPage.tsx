@@ -14,6 +14,7 @@ import {
 } from "./ui/select";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
+console.log("[DEBUG] VITE_BACKEND_URL:", import.meta.env.VITE_BACKEND_URL, "| Using:", BACKEND_URL);
 const ITEMS_PER_PAGE = 24;
 
 interface ListingsPageProps {
