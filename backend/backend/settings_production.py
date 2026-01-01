@@ -94,29 +94,17 @@ WSGI_APPLICATION = "backend.wsgi.application"
 # DATABASE CONFIGURATION
 # =============================================================================
 
-# Default to SQLite for local development
-# For production, use Cloud SQL PostgreSQL
-
-if os.environ.get("USE_CLOUD_SQL", "False").lower() in ("true", "1", "yes"):
-    # Google Cloud SQL (PostgreSQL) configuration
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "orange_housing"),
-            "USER": os.environ.get("DB_USER", "postgres"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "/cloudsql/PROJECT_ID:REGION:INSTANCE_NAME"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
-        }
+# Production uses PostgreSQL (Supabase)
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME", "postgres"),
+        "USER": os.environ.get("DB_USER", "postgres"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", ""),
+        "PORT": os.environ.get("DB_PORT", "5432"),
     }
-else:
-    # Local SQLite database for development
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 # =============================================================================
 # PASSWORD VALIDATION
