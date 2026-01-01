@@ -1,13 +1,15 @@
-import { redirect } from "react-router";
-import type { Route } from "./+types/redirect-rooms";
-
-export function loader({ request }: Route.LoaderArgs) {
-  const url = new URL(request.url);
-  const searchParams = url.searchParams;
-  searchParams.set("type", "rooms");
-  return redirect(`/listings?${searchParams.toString()}`);
-}
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 
 export default function RedirectRooms() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("type", "rooms");
+    navigate(`/listings?${newParams.toString()}`, { replace: true });
+  }, [navigate, searchParams]);
+
   return null;
 }
