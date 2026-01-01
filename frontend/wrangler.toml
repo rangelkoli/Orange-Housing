@@ -1,3 +1,6 @@
 name = "orangehousing"
 compatibility_date = "2025-12-31"
 pages_build_output_dir = "./build/client"
+
+[vars]
+VITE_BACKEND_URL = "https://orange-housing.onrender.com"
