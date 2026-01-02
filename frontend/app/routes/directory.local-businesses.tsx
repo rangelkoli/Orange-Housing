@@ -1,5 +1,4 @@
 import { DirectoryPage, type DirectoryItem } from "../components/DirectoryPage";
-
 import { useState, useEffect } from "react";
 
 export default function LocalBusinessesDirectoryPage() {
@@ -12,16 +11,18 @@ export default function LocalBusinessesDirectoryPage() {
         const response = await fetch("http://localhost:8000/directory/businesses/");
         const result = await response.json();
         if (result.success) {
-          const mappedData = result.data.map((item: any) => ({
+          const mappedData = result.data.map((item: any, index: number) => ({
             id: item.id,
             name: item.name || "Unnamed Business",
-            description: item.contact_name ? `Contact: ${item.contact_name}` : "Local business helping with housing in Syracuse.",
+            description: item.contact_name 
+              ? `Authorized Partner • Contact: ${item.contact_name}` 
+              : "Trusted local business providing essential housing services to the Syracuse community.",
             address: "Syracuse, NY",
             phone: item.phone,
             email: item.email,
             website: item.url,
-            image: "https://images.unsplash.com/photo-1600518464441-9154a4dea21b?q=80&w=1000&auto=format&fit=crop",
-            category: item.category || "Business"
+            // Removed image to comply with user request
+            category: item.category || "Local Business"
           }));
           setItems(mappedData);
         }
@@ -37,11 +38,12 @@ export default function LocalBusinessesDirectoryPage() {
 
   return (
     <DirectoryPage 
-      title="Local Businesses Directory" 
-      subtitle="Discover local businesses that can help with your housing needs in Syracuse."
+      title="Local Business Partners" 
+      subtitle="Connect with trusted local businesses and service providers recommended for the Syracuse University community."
       items={items}
       addListingLink="/directory/local-businesses/add"
-      addListingText="Add Your Business Here"
+      addListingText="Partner With Us"
+      searchPlaceholder="Search local businesses..."
       isPaidListing={true}
       isLoading={isLoading}
     />

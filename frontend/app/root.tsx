@@ -32,8 +32,9 @@ export const links: Route.LinksFunction = () => [
 export function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   // Hide public navbar on landlord dashboard and admin pages
+  const isPublicAuthRoute = ['/landlord/login', '/landlord/signup'].includes(location.pathname);
   const shouldHidePublicNav = 
-    location.pathname.startsWith('/landlord/') || 
+    (location.pathname.startsWith('/landlord/') && !isPublicAuthRoute) || 
     location.pathname.startsWith('/admin');
 
   return (

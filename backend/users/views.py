@@ -128,14 +128,16 @@ def login(request):
                     requires_password_update = True  # User needs to update password
 
             if password_valid:
-                # Update login info and IP address
+                # Update login info and IP address using direct queryset update (more reliable)
                 now = timezone.now()
                 client_ip = get_client_ip(request)
                 
-                user.user_last_login = user.user_login_time
-                user.user_login_time = now
-                user.last_ip = client_ip
-                user.save()
+                # Use queryset update() to avoid any ORM save issues
+                User.objects.filter(user_id=user.user_id).update(
+                    user_last_login=user.user_login_time,
+                    user_login_time=now,
+                    last_ip=client_ip
+                )
 
                 # Determine user role based on user_level
                 if user.user_level == 1:
@@ -218,7 +220,7 @@ def update_password(request):
             user.user_salt = salt.decode('utf-8')
             user.password_type = User.PasswordType.BCRYPT
             user.user_modified = timezone.now()
-            user.save()
+            user.save(update_fields=['user_pass', 'user_salt', 'password_type', 'user_modified'])
 
             return JsonResponse({
                 'message': 'Password updated successfully',
@@ -306,7 +308,17 @@ def update_profile(request):
                 user.user_name = new_username
             
             user.user_modified = timezone.now()
-            user.save()
+            # Build update_fields list based on what was changed
+            update_fields_list = ['user_modified']
+            if 'firstName' in data:
+                update_fields_list.append('first_name')
+            if 'lastName' in data:
+                update_fields_list.append('last_name')
+            if 'contactNumber' in data:
+                update_fields_list.append('contact_number')
+            if 'username' in data:
+                update_fields_list.append('user_name')
+            user.save(update_fields=update_fields_list)
             
             return JsonResponse({
                 'message': 'Profile updated successfully',
@@ -372,7 +384,7 @@ def change_password(request):
             user.user_salt = salt.decode('utf-8')
             user.password_type = User.PasswordType.BCRYPT
             user.user_modified = timezone.now()
-            user.save()
+            user.save(update_fields=['user_pass', 'user_salt', 'password_type', 'user_modified'])
 
             return JsonResponse({
                 'message': 'Password changed successfully'

@@ -35,21 +35,21 @@ import { motion } from "framer-motion";
 import { useFavoritesStore } from "../stores/favoritesStore";
 import { getListingDetailUrl } from "../utils/listingSlug";
 
-// Animation variants
+// Animation variants - using whileInView instead of initial animations to prevent FOIC
 const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0 },
   transition: { duration: 0.6, ease: "easeOut" }
 };
 
 const fadeIn = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
   transition: { duration: 0.6, ease: "easeOut" }
 };
 
 const staggerContainer = {
-  animate: {
+  visible: {
     transition: {
       staggerChildren: 0.1
     }
@@ -57,8 +57,8 @@ const staggerContainer = {
 };
 
 const scaleIn = {
-  initial: { opacity: 0, scale: 0.95 },
-  animate: { opacity: 1, scale: 1 },
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1 },
   transition: { duration: 0.5, ease: "easeOut" }
 };
 
@@ -117,16 +117,14 @@ function Hero() {
       <div className='relative z-20 container mx-auto px-4 max-w-5xl pointer-events-none'>
         <motion.div 
           className="pointer-events-auto"
-          initial="initial"
-          animate="animate"
+          initial="visible"
+          animate="visible"
           variants={staggerContainer}
         >
           <motion.h1 
             className="text-balance text-center mb-8 tracking-tight font-serif text-[40px] md:text-[52px] leading-[1.15] text-stone-800 font-normal"
-            variants={fadeInUp}
-            initial="initial"
-            animate="animate"
-            transition={{ duration: 0.7, ease: "easeOut" }}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
           >
             Find Your
             <span className="relative inline-block mx-2 text-orange-600 italic cursor-pointer hover:text-orange-700
@@ -146,9 +144,8 @@ function Hero() {
             </span>for Rent in Syracuse, New York
           </motion.h1>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 1, y: 0 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
           >
             <SearchWidget />
           </motion.div>

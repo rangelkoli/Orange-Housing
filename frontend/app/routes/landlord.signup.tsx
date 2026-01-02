@@ -53,18 +53,11 @@ export default function LandlordSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF8F3] font-sans text-stone-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-[calc(100vh-64px)] bg-[#FDF8F3] font-sans text-stone-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Pattern (Optional subtle dots) */}
       <div className="absolute inset-0 opacity-[0.4]" style={{ backgroundImage: 'radial-gradient(#E5E7EB 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
 
-      <div className="w-full max-w-[480px] relative z-10 flex flex-col items-center">
-        
-        {/* Logo Section */}
-        <div className="mb-8 flex flex-col items-center text-center">
-          <Link to="/" className="mb-4">
-            <Logo />
-          </Link>
-        </div>
+      <div className="w-full max-w-[480px] relative z-10 flex flex-col items-center py-8">
 
         {/* Main Card */}
         <div className="w-full bg-white rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
