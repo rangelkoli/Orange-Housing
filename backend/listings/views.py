@@ -89,6 +89,7 @@ def _get_raw_listings(visible=True, type_code=None, filters=None, user_id=None):
     """Get listings directly from database to avoid Django ORM date parsing issues"""
     with connection.cursor() as cursor:
         # Build the query
+        # Note: camelCase columns are quoted for PostgreSQL case-sensitivity
         query = """
             SELECT 
                 l.id, l.listing_title, l.address, l.zip, l.unit, l.beds, l.baths, l.rent, 
@@ -97,8 +98,8 @@ def _get_raw_listings(visible=True, type_code=None, filters=None, user_id=None):
                 l.visible, l.featured, l.location, l.perfect_for, l.building_type,
                 l.furnished, l.lease_length, l.tenant_lease_end, l.fireplace,
                 l.dishwasher, l.laundry, l.porch, l.parking, l.smoking,
-                l.is_season, l.total_beds, l.typeCode, l.latLng, l.physicalAddress,
-                l.textOk, l.rent_type, l.cover_photo_id, l.user_id,
+                l.is_season, l.total_beds, l."typeCode", l."latLng", l."physicalAddress",
+                l."textOk", l.rent_type, l.cover_photo_id, l.user_id,
                 l.is_public, l.stripe_subscription_id, l.stripe_payment_link,
                 l.approval_status, l.admin_feedback, l.stripe_payment_method_id,
                 l.social_media_posting, l.social_media_posted, l.social_media_post_id, l.social_media_error
@@ -110,13 +111,13 @@ def _get_raw_listings(visible=True, type_code=None, filters=None, user_id=None):
         params = []
         
         if visible is True:
-            query += " AND l.visible = 1"
+            query += " AND l.visible = TRUE"
         elif visible == 'only_invisible':
-            query += " AND l.visible = 0"
+            query += " AND l.visible = FALSE"
         # if visible is 'all' or False, we show everything (no filter)
         
         if type_code is not None:
-            query += " AND l.typeCode = %s"
+            query += ' AND l."typeCode" = %s'
             params.append(type_code)
 
         if user_id is not None:
@@ -202,7 +203,7 @@ def _get_raw_listings(visible=True, type_code=None, filters=None, user_id=None):
                 }
                 mapped_type = type_mapping.get(listing_type)
                 if mapped_type:
-                    query += " AND l.typeCode = %s"
+                    query += ' AND l."typeCode" = %s'
                     params.append(mapped_type)
         
         query += " ORDER BY l.featured DESC, l.date_created DESC LIMIT 100"
@@ -445,15 +446,15 @@ def featured_list(request):
                         l.visible, l.featured, l.location, l.perfect_for, l.building_type,
                         l.furnished, l.lease_length, l.tenant_lease_end, l.fireplace,
                         l.dishwasher, l.laundry, l.porch, l.parking, l.smoking,
-                        l.is_season, l.total_beds, l.typeCode, l.latLng, l.physicalAddress,
-                        l.textOk, l.rent_type, l.cover_photo_id, l.user_id, l.spotlightListing
+                        l.is_season, l.total_beds, l."typeCode", l."latLng", l."physicalAddress",
+                        l."textOk", l.rent_type, l.cover_photo_id, l.user_id, l."spotlightListing"
                     FROM listings l
-                    WHERE l.visible = 1 
-                      AND l.spotlightListing IS NOT NULL 
-                      AND l.spotlightListing != '' 
-                      AND l.spotlightListing != '0000-00-00'
-                      AND l.spotlightListing >= %s
-                    ORDER BY l.spotlightListing DESC, l.date_created DESC
+                    WHERE l.visible = TRUE 
+                      AND l."spotlightListing" IS NOT NULL 
+                      AND l."spotlightListing" != '' 
+                      AND l."spotlightListing" != '0000-00-00'
+                      AND l."spotlightListing" >= %s
+                    ORDER BY l."spotlightListing" DESC, l.date_created DESC
                     LIMIT 50
                 """, [thirty_days_ago])
                 columns = [col[0] for col in cursor.description]
@@ -486,8 +487,8 @@ def listing_detail(request, listing_id):
                         l.visible, l.featured, l.location, l.perfect_for, l.building_type,
                         l.furnished, l.lease_length, l.tenant_lease_end, l.fireplace,
                         l.dishwasher, l.laundry, l.porch, l.parking, l.smoking,
-                        l.is_season, l.total_beds, l.typeCode, l.latLng, l.physicalAddress,
-                        l.textOk, l.rent_type, l.cover_photo_id, l.user_id
+                        l.is_season, l.total_beds, l."typeCode", l."latLng", l."physicalAddress",
+                        l."textOk", l.rent_type, l.cover_photo_id, l.user_id
                     FROM listings l
                     WHERE l.id = %s
                 """, [listing_id])
@@ -656,7 +657,7 @@ def listing_create(request):
                     data.get('contact_name', ''),
                     data.get('contact_number'),
                     data.get('contact_email'),
-                    0,  # visible=0 until approved
+                    False,  # visible=False until approved
                     data.get('featured', 0),
                     data.get('location'),
                     data.get('building_type'),
@@ -685,11 +686,11 @@ def listing_create(request):
                     data.get('we_prefer'),
                     data.get('my_gender'),
                     data.get('prefer_gender'),
-                    1 if data.get('textOk') else 0,
-                    0, # is_public
+                    True if data.get('textOk') else False,
+                    False, # is_public
                     'draft', # approval_status
-                    1 if data.get('social_media_posting') else 0,
-                    0 # social_media_posted
+                    True if data.get('social_media_posting') else False,
+                    False # social_media_posted
                 ])
 
                 
@@ -799,7 +800,7 @@ def listing_update(request, listing_id):
                     value = data[key]
                     # Handle special cases
                     if key == 'textOk':
-                        value = 1 if value else 0
+                        value = True if value else False
                     update_fields.append(f"{db_field} = %s")
                     params.append(value)
             
@@ -813,7 +814,7 @@ def listing_update(request, listing_id):
                 return JsonResponse({'error': 'No fields to update'}, status=400)
             
             # When a listing is updated, set to invisible for re-review
-            update_fields.append("visible = 0")
+            update_fields.append("visible = FALSE")
             
             params.append(listing_id)
             
@@ -849,8 +850,8 @@ def listing_detail_for_edit(request, listing_id):
                         l.visible, l.featured, l.location, l.perfect_for, l.building_type,
                         l.furnished, l.lease_length, l.tenant_lease_end, l.fireplace,
                         l.dishwasher, l.laundry, l.porch, l.parking, l.smoking,
-                        l.is_season, l.total_beds, l.typeCode, l.latLng, l.physicalAddress,
-                        l.textOk, l.rent_type, l.cover_photo_id, l.user_id,
+                        l.is_season, l.total_beds, l."typeCode", l."latLng", l."physicalAddress",
+                        l."textOk", l.rent_type, l.cover_photo_id, l.user_id,
                         l.house_kitchen, l.house_chores, l.house_sleep, l.house_drink,
                         l.we_are, l.we_prefer, l.my_gender, l.prefer_gender
                     FROM listings l
@@ -1012,11 +1013,11 @@ def admin_pending_listings(request):
                         l.visible, l.featured, l.location, l.perfect_for, l.building_type,
                         l.furnished, l.lease_length, l.tenant_lease_end, l.fireplace,
                         l.dishwasher, l.laundry, l.porch, l.parking, l.smoking,
-                        l.is_season, l.total_beds, l.typeCode, l.latLng, l.physicalAddress,
-                        l.textOk, l.rent_type, l.cover_photo_id, l.user_id,
+                        l.is_season, l.total_beds, l."typeCode", l."latLng", l."physicalAddress",
+                        l."textOk", l.rent_type, l.cover_photo_id, l.user_id,
                         l.stripe_payment_method_id, l.approval_status, l.admin_feedback
                     FROM listings l
-                    WHERE l.visible = 0 AND l.approval_status = 'pending'
+                    WHERE l.visible = FALSE AND l.approval_status = 'pending'
 
                     ORDER BY l.date_created DESC
                     LIMIT 100
@@ -1060,7 +1061,7 @@ def admin_approve_listing(request, listing_id):
                 
                 current_visible, payment_method_id, user_id, type_code, social_media_posting = row
                 
-                if current_visible == 1:
+                if current_visible:
                     return JsonResponse({'message': 'Listing is already visible', 'listing_id': listing_id})
 
             # Check if payment method exists (Setup Intent flow)
@@ -1128,8 +1129,8 @@ def admin_approve_listing(request, listing_id):
             with connection.cursor() as cursor:
                 cursor.execute("""
                     UPDATE listings 
-                    SET visible = 1, 
-                        is_public = 1,
+                    SET visible = TRUE, 
+                        is_public = TRUE,
                         approval_status = 'approved',
                         stripe_subscription_id = %s
                     WHERE id = %s
@@ -1185,7 +1186,7 @@ def admin_request_changes(request, listing_id):
                     UPDATE listings 
                     SET approval_status = 'changes_requested',
                         admin_feedback = %s,
-                        visible = 0
+                        visible = FALSE
                     WHERE id = %s
                 """, [feedback, listing_id])
             
@@ -1219,14 +1220,14 @@ def admin_reject_listing(request, listing_id):
                     return JsonResponse({'error': 'Listing not found'}, status=404)
                 
                 current_visible = row[0]
-                if current_visible == 0:
+                if not current_visible:
                     return JsonResponse({'message': 'Listing is already hidden', 'listing_id': listing_id})
             
             # Reject the listing (make invisible)
             with connection.cursor() as cursor:
                 cursor.execute("""
                     UPDATE listings 
-                    SET visible = 0 
+                    SET visible = FALSE 
                     WHERE id = %s
                 """, [listing_id])
             
