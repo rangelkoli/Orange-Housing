@@ -451,8 +451,6 @@ def featured_list(request):
                     FROM listings l
                     WHERE l.visible = TRUE 
                       AND l."spotlightListing" IS NOT NULL 
-                      AND l."spotlightListing" != '' 
-                      AND l."spotlightListing" != '0000-00-00'
                       AND l."spotlightListing" >= %s
                     ORDER BY l."spotlightListing" DESC, l.date_created DESC
                     LIMIT 50
