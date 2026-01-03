@@ -370,3 +370,26 @@ def sync_subscriptions(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+@permission_classes([])
+def create_portal_session(request):
+    """
+    Creates a Stripe Billing Portal session for the user.
+    """
+    user_id = request.data.get('user_id')
+    if not user_id:
+        return JsonResponse({'error': 'user_id is required'}, status=400)
+    
+    user = get_object_or_404(User, pk=user_id)
+    if not user.stripe_customer_id:
+        return JsonResponse({'error': 'No Stripe customer record found. Please subscribe to a listing first.'}, status=400)
+    
+    try:
+        portal_session = stripe.billing_portal.Session.create(
+            customer=user.stripe_customer_id,
+            return_url=f"{settings.FRONTEND_URL}/landlord/billing",
+        )
+        return JsonResponse({'url': portal_session.url})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

@@ -1,15 +1,57 @@
-import { CreditCard, Receipt, Calendar, DollarSign, ExternalLink } from "lucide-react";
+import { CreditCard, Receipt, Calendar, DollarSign, ExternalLink, Loader2, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
 import { useAuthStore } from "../stores/authStore";
+import { useState, useEffect, useMemo } from "react";
 
 export default function LandlordBilling() {
   const { user } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+  const [listings, setListings] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      if (!user?.id) return;
+      try {
+        setLoading(true);
+        const backendUrl = import.meta.env.VITE_BACKEND_URL;
+        const response = await fetch(`${backendUrl}/listings/landlord/?user_id=${user.id}`);
+        const data = await response.json();
+        if (response.ok) {
+          setListings(data.listings || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch listings for billing:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchListings();
+  }, [user?.id]);
+
+  const activeListingsCount = useMemo(() => {
+    return listings.filter(l => l.is_public).length;
+  }, [listings]);
+
+  const monthlyTotal = useMemo(() => {
+    return listings.reduce((total, l) => {
+      if (!l.is_public) return total;
+      
+      let cost = 10; // Standard price
+      if (l.featured && l.featured > 0) cost = 300; // Featured price
+      if (l.social_media_posting) cost += 10; // Social media add-on
+      
+      return total + cost;
+    }, 0);
+  }, [listings]);
 
   const handleManagePayments = async () => {
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL;
+      // Note: The original code used /payments/create-portal-session/ but it might not exist yet.
+      // Keeping it for now as it was there, but adding a check or fallback might be good.
       const response = await fetch(`${backendUrl}/payments/create-portal-session/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -32,7 +74,7 @@ export default function LandlordBilling() {
           <div>
             <h1 className="text-4xl font-serif font-bold text-stone-900">Billing & Payments</h1>
             <p className="text-stone-500 mt-2">
-              Manage your subscriptions, payment methods, and view invoices.
+              Manage your property listings, monthly billing, and view invoices.
             </p>
           </div>
           <Button
@@ -50,11 +92,13 @@ export default function LandlordBilling() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-display font-bold text-stone-500 uppercase tracking-[0.2em]">Active Subscriptions</p>
-                  <h3 className="text-3xl font-serif font-bold text-stone-900 mt-1">0</h3>
+                  <p className="text-[10px] font-display font-bold text-stone-500 uppercase tracking-[0.2em]">Active Listings</p>
+                  <h3 className="text-3xl font-serif font-bold text-stone-900 mt-1">
+                    {loading ? <Loader2 size={24} className="animate-spin text-stone-300" /> : activeListingsCount}
+                  </h3>
                 </div>
                 <div className="p-4 rounded-2xl bg-green-50 text-green-600 transition-transform duration-500 group-hover:scale-110">
-                  <CreditCard size={28} />
+                  <Building2 size={28} />
                 </div>
               </div>
             </CardContent>
@@ -65,7 +109,9 @@ export default function LandlordBilling() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-display font-bold text-stone-500 uppercase tracking-[0.2em]">Monthly Total</p>
-                  <h3 className="text-3xl font-serif font-bold text-stone-900 mt-1">$0</h3>
+                  <h3 className="text-3xl font-serif font-bold text-stone-900 mt-1">
+                    {loading ? <Loader2 size={24} className="animate-spin text-stone-300" /> : `$${monthlyTotal}`}
+                  </h3>
                 </div>
                 <div className="p-4 rounded-2xl bg-blue-50 text-blue-600 transition-transform duration-500 group-hover:scale-110">
                   <DollarSign size={28} />
@@ -89,29 +135,6 @@ export default function LandlordBilling() {
           </Card>
         </div>
 
-        {/* Payment Methods */}
-        <Card className="border-stone-100 shadow-sm">
-          <CardHeader className="border-b border-stone-100 bg-white/50 backdrop-blur-sm px-6 py-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-serif font-bold text-stone-900">Payment Methods</h2>
-              <Button variant="outline" size="sm" onClick={handleManagePayments} className="text-stone-600">
-                <CreditCard size={14} className="mr-2" />
-                Add Method
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center justify-center text-center py-8">
-              <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mb-4">
-                <CreditCard className="w-8 h-8 text-stone-400" />
-              </div>
-              <p className="text-stone-500 text-sm">
-                Manage your payment methods through Stripe's secure portal.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Recent Invoices */}
         <Card className="border-stone-100 shadow-sm">
           <CardHeader className="border-b border-stone-100 bg-white/50 backdrop-blur-sm px-6 py-4">
@@ -129,7 +152,7 @@ export default function LandlordBilling() {
               </div>
               <h3 className="text-lg font-semibold text-stone-700 mb-2">No invoices yet</h3>
               <p className="text-stone-500 text-sm max-w-md">
-                When you subscribe to list properties, your invoices will appear here.
+                Your recent invoices will appear here. You can also view your full billing history on Stripe.
               </p>
             </div>
           </CardContent>
